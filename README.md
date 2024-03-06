@@ -26,5 +26,5 @@ This project aims to develop an application for managing tennis courts and reser
 
 ## Technologies Used
 
-- Frontend: React/NextJS (TypeScript), TailwindCSS
+- Frontend: React/Next.js (TypeScript), TailwindCSS
 - Backend: Java, Spring Boot, PostgreSQL, Docker
