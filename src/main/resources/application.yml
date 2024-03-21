@@ -1,1 +1,10 @@
-
+spring:
+  jpa:
+    defer-datasource-initialization: true
+  servlet:
+    multipart:
+      max-file-size: 26214400
+      max-request-size: 26214400
+server:
+  error:
+    include-message: always

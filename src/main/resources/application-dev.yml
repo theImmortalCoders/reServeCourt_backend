@@ -1,0 +1,20 @@
+springdoc:
+  swagger-ui:
+    path: /api/docs.html
+    tags-sorter: alpha
+    operations-sorter: method
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5430/data
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+reserve-court:
+  security:
+    allowedOrigins:
+      - http://localhost:8080
+      - http://localhost:3000
+      - http://192.168.100.204:3000
