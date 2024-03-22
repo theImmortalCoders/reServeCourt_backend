@@ -1,4 +1,4 @@
-package pl.chopy.reserve_court_backend.model;
+package pl.chopy.reserve_court_backend.util;
 
 import lombok.Data;
 

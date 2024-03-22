@@ -23,9 +23,9 @@ import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapperImpl;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserChangePasswordRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleRequest;
-import pl.chopy.reserve_court_backend.model.StringAsJSON;
 import pl.chopy.reserve_court_backend.model.entity.User;
-import pl.chopy.reserve_court_backend.model.repository.UserRepository;
+import pl.chopy.reserve_court_backend.model.entity.repository.UserRepository;
+import pl.chopy.reserve_court_backend.util.StringAsJSON;
 
 import java.util.Optional;
 

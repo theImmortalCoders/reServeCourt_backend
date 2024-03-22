@@ -21,7 +21,7 @@ import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserSingleResponse
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserChangePasswordRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleRequest;
 import pl.chopy.reserve_court_backend.model.entity.User;
-import pl.chopy.reserve_court_backend.model.repository.UserRepository;
+import pl.chopy.reserve_court_backend.model.entity.repository.UserRepository;
 
 @Service
 @AllArgsConstructor
@@ -53,9 +53,8 @@ public class UserService {
     }
 
     void authenticate(@NotNull UserSingleRequest userRequest, HttpServletRequest request, HttpServletResponse response) {
-        Option.ofOptional(userRepository.findByUsername(userRequest.getUsername()))
-                .map(admin -> passwordEncoder.matches(userRequest.getPassword(), admin.getHashedPassword()))
-                .filter(a -> a)
+        var user = Option.ofOptional(userRepository.findByUsername(userRequest.getUsername()))
+                .filter(u -> passwordEncoder.matches(userRequest.getPassword(), u.getHashedPassword()))
                 .getOrElseThrow(() ->
                         new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials for user '" + userRequest.getUsername() + "'.")
                 );
@@ -63,8 +62,10 @@ public class UserService {
         SecurityContext context = securityContextHolderStrategy.createEmptyContext();
         context.setAuthentication(new UsernamePasswordAuthenticationToken(
                 userRequest.getUsername(),
-                userRequest.getPassword()
+                user.getHashedPassword(),
+                user.getAuthorities()
         ));
+
         securityContextHolderStrategy.setContext(context);
         securityContextRepository.saveContext(context, request, response);
     }

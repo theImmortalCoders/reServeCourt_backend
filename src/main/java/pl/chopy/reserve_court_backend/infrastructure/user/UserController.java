@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserChangePasswordRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleRequest;
-import pl.chopy.reserve_court_backend.model.StringAsJSON;
+import pl.chopy.reserve_court_backend.util.StringAsJSON;
 
 @RestController
 @Tag(name = "User", description = "user authentication operations")
@@ -64,7 +64,7 @@ public class UserController {
     @Operation(summary = "Get current user (Auth)", description = "Get current user details (check if authenticated)")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UserSingleResponse> me() {
         return ResponseEntity.ok(userService.getCurrentUserResponse());
     }

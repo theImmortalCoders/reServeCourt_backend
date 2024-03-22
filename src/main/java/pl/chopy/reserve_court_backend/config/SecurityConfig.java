@@ -29,7 +29,7 @@ import static org.springframework.security.web.header.writers.ClearSiteDataHeade
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 @AllArgsConstructor
 public class SecurityConfig {
     private final ApplicationProps applicationProps;
