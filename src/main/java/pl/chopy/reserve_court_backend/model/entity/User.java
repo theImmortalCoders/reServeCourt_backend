@@ -24,20 +24,11 @@ public class User implements UserDetails {
     private String hashedPassword;
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.USER;
-    private boolean isActive = true;
+    private boolean active = true;
     private String name;
     private String surname;
     private LocalDate birthDate;
     private String phoneNumber;
-
-    public User(String email, String hashedPassword, String phoneNumber, String name, String surname, LocalDate birthDate) {
-        this.email = email;
-        this.hashedPassword = hashedPassword;
-        this.name = name;
-        this.surname = surname;
-        this.phoneNumber = phoneNumber;
-        this.birthDate = birthDate;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -56,21 +47,21 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return isActive;
+        return active;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return isActive;
+        return active;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return isActive;
+        return active;
     }
 
     @Override
     public boolean isEnabled() {
-        return isActive;
+        return active;
     }
 }

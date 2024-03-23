@@ -32,8 +32,7 @@ import pl.chopy.reserve_court_backend.util.StringAsJSON;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -59,11 +58,13 @@ public class UserServiceTest {
     @Mock
     private HttpServletResponse response;
     @Mock
-    private UserRepository userRepository;
-    @Mock
     private SecurityContextHolderStrategy securityContextHolderStrategy;
     @Mock
     private SecurityContextRepository securityContextRepository;
+
+    private final UserRepository userRepository = mock(UserRepository.class);
+    @Spy
+    private final UserUtil userUtil = new UserUtil(userRepository);
 
     @InjectMocks
     private UserService userService;
@@ -95,23 +96,20 @@ public class UserServiceTest {
         userSingleResponse.setActive(true);
 
         when(userRepository.findByEmail("user@mail.com")).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(SecurityContextHolder.getContext().getAuthentication().getName())
+                .thenReturn("user@mail.com");
     }
 
     @Test
     public void shouldGetCurrentUser() {
-        when(SecurityContextHolder.getContext().getAuthentication().getName())
-                .thenReturn("user@mail.com");
-
-        User currentuser = userService.getCurrentUser();
+        User currentuser = userUtil.getCurrentUser();
 
         assertEquals(user, currentuser);
     }
 
     @Test
     public void shouldGetCurrentUserResponse() {
-        when(SecurityContextHolder.getContext().getAuthentication().getName())
-                .thenReturn("user@mail.com");
-
         UserSingleResponse currentUser = userService.getCurrentUserResponse();
 
         assertEquals(userSingleResponse, currentUser);
@@ -126,7 +124,7 @@ public class UserServiceTest {
 
         assertThrows(
                 ResponseStatusException.class,
-                () -> userService.getCurrentUser()
+                userUtil::getCurrentUser
         );
     }
 
@@ -137,7 +135,7 @@ public class UserServiceTest {
 
         assertThrows(
                 ResponseStatusException.class,
-                () -> userService.getCurrentUser()
+                userUtil::getCurrentUser
         );
     }
 
@@ -186,9 +184,6 @@ public class UserServiceTest {
         request.setOldPassword("password");
         request.setNewPassword("new_password");
 
-        when(SecurityContextHolder.getContext().getAuthentication().getName())
-                .thenReturn("user@mail.com");
-
         userService.changePassword(request);
 
         verify(userRepository, times(1)).save(any(User.class));
@@ -205,8 +200,6 @@ public class UserServiceTest {
 
     @Test
     public void shouldChangeEmail() {
-        when(SecurityContextHolder.getContext().getAuthentication().getName())
-                .thenReturn("user@mail.com");
         when(userRepository.save(user)).thenReturn(user);
 
         StringAsJSON usernameRequest = new StringAsJSON();
@@ -221,7 +214,7 @@ public class UserServiceTest {
     public void shouldUpdateRole() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        userService.updateRole(1L, UserRole.ADMIN);
+        userService.updateUserRole(1L, UserRole.ADMIN);
 
         assertEquals(UserRole.ADMIN, user.getRole());
     }
@@ -240,12 +233,32 @@ public class UserServiceTest {
     }
 
     @Test
-    public void shouldDeleteUser(){
-        when(SecurityContextHolder.getContext().getAuthentication().getName())
-                .thenReturn("user@mail.com");
-
+    public void shouldDeleteUser() {
         userService.deleteAccount(request, response);
 
         verify(userRepository, times(1)).delete(any(User.class));
+    }
+
+    @Test
+    public void shouldThrowBadRequestWhenBanUser() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        assertThrows(
+                ResponseStatusException.class,
+                () -> userService.banUser(1L)
+        );
+    }
+
+    @Test
+    public void shouldBanUser() {
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setEmail("user2@mail.com");
+
+        when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
+
+        userService.banUser(2L);
+
+        assertFalse(user2.isActive());
     }
 }

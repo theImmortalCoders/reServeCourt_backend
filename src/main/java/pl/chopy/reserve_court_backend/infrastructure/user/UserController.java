@@ -71,7 +71,7 @@ public class UserController {
     @ApiResponse(responseCode = "404", description = "User not found")
     @PreAuthorize("hasAuthority('ADMIN')")
     public void updateRole(@PathVariable Long userId, @RequestBody UserRole newRole) {
-        userService.updateRole(userId, newRole);
+        userService.updateUserRole(userId, newRole);
     }
 
     @PatchMapping("/{userId}/ban")
@@ -87,7 +87,7 @@ public class UserController {
     }
 
     @DeleteMapping
-    @Operation(summary = "Change user's role (Admin)", description = "Change user's role")
+    @Operation(summary = "Delete account (Auth)", description = "Delete current user account")
     @ApiResponse(responseCode = "200", description = "Successfully deleted")
     @ApiResponse(responseCode = "400", description = "Invalid request")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -102,16 +102,6 @@ public class UserController {
     @ApiResponse(responseCode = "401", description = "Unauthorized")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserSingleResponse> me() {
-        return ResponseEntity.ok(userService.getCurrentUserResponse());
-    }
-
-    @GetMapping("/me-admin")
-    @Operation(summary = "Get current user (Admin)", description = "Get current user admin details (check if authenticated)")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved")
-    @ApiResponse(responseCode = "401", description = "Unauthorized")
-    @ApiResponse(responseCode = "403", description = "Forbidden")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<UserSingleResponse> meAdmin() {
         return ResponseEntity.ok(userService.getCurrentUserResponse());
     }
 
