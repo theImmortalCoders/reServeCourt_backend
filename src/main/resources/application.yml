@@ -8,3 +8,10 @@ spring:
 server:
   error:
     include-message: always
+reserve-court:
+  security:
+    defaultRole: USER
+    privileges:
+      USER:
+      ADMIN:
+        - CAN_EDIT
