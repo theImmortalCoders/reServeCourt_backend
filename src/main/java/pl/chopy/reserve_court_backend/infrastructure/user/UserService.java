@@ -19,9 +19,14 @@ import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapper;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserChangePasswordRequest;
-import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleRequest;
+import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleLoginRequest;
+import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleRegisterRequest;
+import pl.chopy.reserve_court_backend.model.UserRole;
 import pl.chopy.reserve_court_backend.model.entity.User;
 import pl.chopy.reserve_court_backend.model.entity.repository.UserRepository;
+
+import java.time.LocalDate;
+import java.time.Period;
 
 @Service
 @AllArgsConstructor
@@ -40,7 +45,7 @@ public class UserService {
                         new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated.")
                 );
 
-        return Option.ofOptional(userRepository.findByUsername(username))
+        return Option.ofOptional(userRepository.findByEmail(username))
                 .getOrElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND, "User '" + username + "' not found.")
                 );
@@ -52,16 +57,16 @@ public class UserService {
         return userMapper.map(getCurrentUser());
     }
 
-    void authenticate(@NotNull UserSingleRequest userRequest, HttpServletRequest request, HttpServletResponse response) {
-        var user = Option.ofOptional(userRepository.findByUsername(userRequest.getUsername()))
+    void authenticate(@NotNull UserSingleLoginRequest userRequest, HttpServletRequest request, HttpServletResponse response) {
+        var user = Option.ofOptional(userRepository.findByEmail(userRequest.getEmail()))
                 .filter(u -> passwordEncoder.matches(userRequest.getPassword(), u.getHashedPassword()))
                 .getOrElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials for user '" + userRequest.getUsername() + "'.")
+                        new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials for user '" + userRequest.getEmail() + "'.")
                 );
 
         SecurityContext context = securityContextHolderStrategy.createEmptyContext();
         context.setAuthentication(new UsernamePasswordAuthenticationToken(
-                userRequest.getUsername(),
+                userRequest.getEmail(),
                 user.getHashedPassword(),
                 user.getAuthorities()
         ));
@@ -70,16 +75,31 @@ public class UserService {
         securityContextRepository.saveContext(context, request, response);
     }
 
-    void register(@NotNull UserSingleRequest request) {
-        Option.ofOptional(userRepository.findByUsername(request.getUsername()))
+    void register(@NotNull UserSingleRegisterRequest request) {
+        Option.ofOptional(userRepository.findByEmail(request.getEmail()))
                 .map(user -> {
-                    throw new ResponseStatusException(HttpStatus.CONFLICT, "User '" + request.getUsername() + "' already exists");
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "User '" + request.getEmail() + "' already exists");
                 });
 
+        if (Period.between(request.getBirthDate(), LocalDate.now()).getYears() < 15) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not have 15 years old");
+        }
+
         userRepository.save(new User(
-                request.getUsername(),
-                passwordEncoder.encode(request.getPassword())
+                request.getEmail(),
+                passwordEncoder.encode(request.getPassword()),
+                request.getPhoneNumber(),
+                request.getName(),
+                request.getSurname(),
+                request.getBirthDate()
         ));
+    }
+
+    public void deleteAccount(HttpServletRequest request, HttpServletResponse response) {
+        User user = getCurrentUser();
+        logoutAdmin(request, response);
+
+        userRepository.delete(user);
     }
 
     void changePassword(@NotNull UserChangePasswordRequest request) {
@@ -93,15 +113,43 @@ public class UserService {
         userRepository.save(user);
     }
 
-    void changeUsername(@NotNull String username, HttpServletRequest request, HttpServletResponse response) {
-        User user = userRepository.findByUsername(getCurrentUser().getUsername()).orElseThrow(
+    void changeEmail(@NotNull String email, HttpServletRequest request, HttpServletResponse response) {
+        User user = userRepository.findByEmail(getCurrentUser().getUsername()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
         );
 
-        user.setUsername(username);
+        user.setEmail(email);
         userRepository.save(user);
 
         logoutAdmin(request, response);
+    }
+
+    public void updateRole(Long userId, UserRole newRole) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+                );
+
+        Option.of(user)
+                .peek(u -> u.setRole(newRole))
+                .map(userRepository::save)
+                .getOrElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role does not exist")
+                );
+    }
+
+    public void banUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+                );
+
+        if(user.getId().equals(getCurrentUser().getId())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot ban yourself");
+        }
+
+        user.setActive(false);
+        userRepository.save(user);
     }
 
     //

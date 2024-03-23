@@ -8,6 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import pl.chopy.reserve_court_backend.model.UserRole;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
@@ -19,20 +20,33 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(unique = true)
-    private String username;
+    private String email;
     private String hashedPassword;
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.USER;
     private boolean isActive = true;
+    private String name;
+    private String surname;
+    private LocalDate birthDate;
+    private String phoneNumber;
 
-    public User(String username, String encode) {
-        this.username = username;
-        this.hashedPassword = encode;
+    public User(String email, String hashedPassword, String phoneNumber, String name, String surname, LocalDate birthDate) {
+        this.email = email;
+        this.hashedPassword = hashedPassword;
+        this.name = name;
+        this.surname = surname;
+        this.phoneNumber = phoneNumber;
+        this.birthDate = birthDate;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.toString()));
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 
     @Override
