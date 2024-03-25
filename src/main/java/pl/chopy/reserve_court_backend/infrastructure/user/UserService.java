@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapper;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserSingleResponse;
+import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.CourtOwnerSingleBecomeRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserChangePasswordRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleLoginRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleRegisterRequest;
@@ -44,21 +45,13 @@ public class UserService {
     }
 
     void authenticate(@NotNull UserSingleLoginRequest userRequest, HttpServletRequest request, HttpServletResponse response) {
-        var user = Option.ofOptional(getOptionalByEmail(userRequest.getEmail()))
+        User user = Option.ofOptional(getOptionalByEmail(userRequest.getEmail()))
                 .filter(u -> passwordEncoder.matches(userRequest.getPassword(), u.getHashedPassword()))
                 .getOrElseThrow(() ->
                         new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials for user '" + userRequest.getEmail() + "'.")
                 );
 
-        SecurityContext context = securityContextHolderStrategy.createEmptyContext();
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(
-                userRequest.getEmail(),
-                user.getHashedPassword(),
-                user.getAuthorities()
-        ));
-
-        securityContextHolderStrategy.setContext(context);
-        securityContextRepository.saveContext(context, request, response);
+        updateSecurityContext(request, response, user);
     }
 
     void register(@NotNull UserSingleRegisterRequest request) {
@@ -104,6 +97,19 @@ public class UserService {
         logoutAdmin(request, response);
     }
 
+    public void becomeOwner(CourtOwnerSingleBecomeRequest ownerRequest, HttpServletRequest request, HttpServletResponse response) {
+        User user = userUtil.getCurrentUser();
+
+        user.setAddress(ownerRequest.getAddress());
+        user.setCity(ownerRequest.getCity());
+        user.setCompanyName(ownerRequest.getCompanyName());
+        user.setRole(UserRole.OWNER);
+
+        userUtil.saveUser(user);
+
+        updateSecurityContext(request, response, user);
+    }
+
     void updateUserRole(Long userId, UserRole newRole) {
         User user = getUserById(userId);
 
@@ -129,6 +135,18 @@ public class UserService {
                 .orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
                 );
+    }
+
+    private void updateSecurityContext(HttpServletRequest request, HttpServletResponse response, User user) {
+        SecurityContext context = securityContextHolderStrategy.createEmptyContext();
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(
+                user.getEmail(),
+                user.getHashedPassword(),
+                user.getAuthorities()
+        ));
+
+        securityContextHolderStrategy.setContext(context);
+        securityContextRepository.saveContext(context, request, response);
     }
 
     private Optional<User> getOptionalByEmail(String email) {

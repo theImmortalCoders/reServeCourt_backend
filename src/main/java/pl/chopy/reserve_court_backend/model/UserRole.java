@@ -1,5 +1,5 @@
 package pl.chopy.reserve_court_backend.model;
 
 public enum UserRole {
-    USER, ADMIN
+    USER, OWNER, ADMIN
 }
