@@ -15,4 +15,7 @@ public class UserSingleResponse {
     private UserRole role;
     private boolean isActive;
     private LocalDate birthDate;
+    private String companyName;
+    private String address;
+    private String city;
 }

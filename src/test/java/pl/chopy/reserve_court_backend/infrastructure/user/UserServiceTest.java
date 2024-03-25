@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapper;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapperImpl;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserSingleResponse;
+import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.CourtOwnerSingleBecomeRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserChangePasswordRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleLoginRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleRegisterRequest;
@@ -237,6 +238,18 @@ public class UserServiceTest {
         userService.deleteAccount(request, response);
 
         verify(userRepository, times(1)).delete(any(User.class));
+    }
+
+    @Test
+    public void shouldBecomeCourtOwner() {
+        var ownerRequest = new CourtOwnerSingleBecomeRequest();
+        ownerRequest.setAddress("address");
+        ownerRequest.setCity("city");
+        ownerRequest.setCompanyName("company");
+
+        userService.becomeOwner(ownerRequest, request, response);
+
+        assertEquals(UserRole.OWNER, user.getRole());
     }
 
     @Test
