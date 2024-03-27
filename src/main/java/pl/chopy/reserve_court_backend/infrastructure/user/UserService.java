@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import pl.chopy.reserve_court_backend.infrastructure.mail.MailTemplateService;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapper;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.CourtOwnerSingleBecomeRequest;
@@ -35,6 +36,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final UserUtil userUtil;
+    private final MailTemplateService mailTemplateService;
 
     private final BCryptPasswordEncoder passwordEncoder;
     private final SecurityContextHolderStrategy securityContextHolderStrategy;
@@ -68,6 +70,7 @@ public class UserService {
         user.setHashedPassword(passwordEncoder.encode(request.getPassword()));
 
         userUtil.saveUser(user);
+        mailTemplateService.sendWelcomeEmail(user.getEmail(), user.getName());
     }
 
     void deleteAccount(HttpServletRequest request, HttpServletResponse response) {

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Witamy!</title>
+</head>
+<body>
+
+<div class="container">
+    <h1>Witaj <span th:text="${name}">[Imię]</span>,</h1>
+    <p>Dziękujemy za założenie konta w naszym serwisie. Twój adres e-mail to: <span th:text="${email}">[E-mail]</span>.
+    </p>
+</div>
+
+</body>
+</html>
