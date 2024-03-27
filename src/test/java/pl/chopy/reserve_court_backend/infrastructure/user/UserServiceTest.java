@@ -18,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.server.ResponseStatusException;
+import pl.chopy.reserve_court_backend.infrastructure.mail.MailTemplateService;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapper;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapperImpl;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserSingleResponse;
@@ -58,6 +59,8 @@ public class UserServiceTest {
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
+    @Mock
+    private MailTemplateService mailTemplateService;
     @Mock
     private SecurityContextHolderStrategy securityContextHolderStrategy;
     @Mock
