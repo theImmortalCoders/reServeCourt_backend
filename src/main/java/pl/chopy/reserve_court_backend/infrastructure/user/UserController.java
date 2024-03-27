@@ -71,7 +71,7 @@ public class UserController {
     @ApiResponse(responseCode = "403", description = "Forbidden")
     @ApiResponse(responseCode = "404", description = "User not found")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void updateRole(@PathVariable Long userId, @RequestBody UserRole newRole) {
+    public void updateRole(@PathVariable Long userId, @RequestParam UserRole newRole) {
         userService.updateUserRole(userId, newRole);
     }
 
