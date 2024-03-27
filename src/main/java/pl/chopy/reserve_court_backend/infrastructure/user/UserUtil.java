@@ -28,6 +28,13 @@ public class UserUtil {
                 );
     }
 
+    public User getUserById(Long userId) {
+        return Option.ofOptional(userRepository.findById(userId))
+                .getOrElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "User '" + userId + "' not found.")
+                );
+    }
+
     public void saveUser(User user) {
         Option.of(userRepository.save(user))
                 .getOrElseThrow(

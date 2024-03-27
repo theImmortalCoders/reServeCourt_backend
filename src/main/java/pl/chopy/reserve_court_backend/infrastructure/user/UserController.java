@@ -19,8 +19,8 @@ import pl.chopy.reserve_court_backend.model.UserRole;
 import pl.chopy.reserve_court_backend.util.StringAsJSON;
 
 @RestController
-@Tag(name = "User", description = "user authentication operations")
-@RequestMapping("/api")
+@Tag(name = "User", description = "User authentication operations")
+@RequestMapping("/api/user")
 @AllArgsConstructor
 public class UserController {
     private final UserService userService;

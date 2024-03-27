@@ -72,7 +72,7 @@ public class UserService {
 
     void deleteAccount(HttpServletRequest request, HttpServletResponse response) {
         User user = userUtil.getCurrentUser();
-        logoutAdmin(request, response);
+        logoutUser(request, response);
 
         userRepository.delete(user);
     }
@@ -94,7 +94,7 @@ public class UserService {
         user.setEmail(email);
         userUtil.saveUser(user);
 
-        logoutAdmin(request, response);
+        logoutUser(request, response);
     }
 
     public void becomeOwner(CourtOwnerSingleBecomeRequest ownerRequest, HttpServletRequest request, HttpServletResponse response) {
@@ -153,7 +153,7 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    private void logoutAdmin(HttpServletRequest request, HttpServletResponse response) {
+    private void logoutUser(HttpServletRequest request, HttpServletResponse response) {
         SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
         logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
         SecurityContextHolder.getContext().setAuthentication(null);
