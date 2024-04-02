@@ -23,6 +23,7 @@ public class MailSendingUtil {
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
         try {
             helper.setTo(to);
+            helper.setFrom("the.immortalcoders@gmail.com");
             helper.setSubject(subject);
             String htmlContent = templateEngine.process(templateName, context);
             helper.setText(htmlContent, true);
