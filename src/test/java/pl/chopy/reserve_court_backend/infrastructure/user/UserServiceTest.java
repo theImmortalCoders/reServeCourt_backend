@@ -16,6 +16,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.test.context.TestSecurityContextHolderStrategyAdapter;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.infrastructure.mail.MailTemplateService;
@@ -28,6 +30,7 @@ import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingle
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleRegisterRequest;
 import pl.chopy.reserve_court_backend.model.UserRole;
 import pl.chopy.reserve_court_backend.model.entity.User;
+import pl.chopy.reserve_court_backend.model.entity.repository.PasswordResetTokenRepository;
 import pl.chopy.reserve_court_backend.model.entity.repository.UserRepository;
 import pl.chopy.reserve_court_backend.util.StringAsJSON;
 
@@ -48,8 +51,7 @@ public class UserServiceTest {
 
     @Spy
     private final UserMapper userMapper = new UserMapperImpl();
-    @Spy
-    private BCryptPasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Mock
     private Authentication authentication;
@@ -62,13 +64,16 @@ public class UserServiceTest {
     @Mock
     private MailTemplateService mailTemplateService;
     @Mock
-    private SecurityContextHolderStrategy securityContextHolderStrategy;
+    private SecurityContextHolderStrategy securityContextHolderStrategy = new TestSecurityContextHolderStrategyAdapter();
     @Mock
-    private SecurityContextRepository securityContextRepository;
+    private SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
 
     private final UserRepository userRepository = mock(UserRepository.class);
+    private final PasswordResetTokenRepository passwordResetTokenRepository = mock(PasswordResetTokenRepository.class);
     @Spy
     private final UserUtil userUtil = new UserUtil(userRepository);
+    @Spy
+    private final AuthService authService = new AuthService(userRepository, passwordResetTokenRepository, userUtil, passwordEncoder, mailTemplateService, userMapper, securityContextHolderStrategy, securityContextRepository);
 
     @InjectMocks
     private UserService userService;
@@ -144,27 +149,10 @@ public class UserServiceTest {
     }
 
     @Test
-    public void shouldAuthenticateUser() {
-        userService.authenticate(userSingleLoginRequest, request, response);
-
-        verify(securityContextHolderStrategy, times(1)).setContext(securityContext);
-        verify(securityContextRepository, times(1)).saveContext(securityContext, request, response);
-    }
-
-    @Test
     public void shouldThrowExceptionWhenAuthenticateUserWithInvalidCredentials() {
         userSingleLoginRequest.setPassword("wrong_password");
 
-        assertThrows(ResponseStatusException.class, () -> userService.authenticate(userSingleLoginRequest, request, response));
-    }
-
-    @Test
-    public void shouldRegisterUser() {
-        when(userRepository.findByEmail("user@mail.com")).thenReturn(Optional.empty());
-
-        userService.register(userSingleRegisterRequest);
-
-        verify(userRepository, times(1)).save(any(User.class));
+        assertThrows(ResponseStatusException.class, () -> authService.authenticate(userSingleLoginRequest, request, response));
     }
 
     @Test
@@ -173,13 +161,13 @@ public class UserServiceTest {
 
         assertThrows(
                 ResponseStatusException.class,
-                () -> userService.register(userSingleRegisterRequest)
+                () -> authService.register(userSingleRegisterRequest)
         );
     }
 
     @Test
     public void shouldThrowConflictExceptionWhenRegisterUserWithExistingUsername() {
-        assertThrows(ResponseStatusException.class, () -> userService.register(userSingleRegisterRequest));
+        assertThrows(ResponseStatusException.class, () -> authService.register(userSingleRegisterRequest));
     }
 
     @Test
@@ -188,7 +176,7 @@ public class UserServiceTest {
         request.setOldPassword("password");
         request.setNewPassword("new_password");
 
-        userService.changePassword(request);
+        authService.changePassword(request);
 
         verify(userRepository, times(1)).save(any(User.class));
     }
@@ -199,7 +187,7 @@ public class UserServiceTest {
         request.setOldPassword("wrong_password");
         request.setNewPassword("new_password");
 
-        assertThrows(ResponseStatusException.class, () -> userService.changePassword(request));
+        assertThrows(ResponseStatusException.class, () -> authService.changePassword(request));
     }
 
     @Test

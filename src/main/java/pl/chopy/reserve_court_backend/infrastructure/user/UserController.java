@@ -24,13 +24,14 @@ import pl.chopy.reserve_court_backend.util.StringAsJSON;
 @AllArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final AuthService authService;
 
     @PostMapping("/login")
     @Operation(summary = "Authenticate user", description = "Authentication using username and password")
     @ApiResponse(responseCode = "200", description = "Successfully authenticated")
     @ApiResponse(responseCode = "401", description = "Invalid credentials")
     public void authenticate(@RequestBody @Valid UserSingleLoginRequest userRequest, HttpServletRequest request, HttpServletResponse response) {
-        userService.authenticate(userRequest, request, response);
+        authService.authenticate(userRequest, request, response);
     }
 
     @PostMapping("/register")
@@ -39,7 +40,7 @@ public class UserController {
     @ApiResponse(responseCode = "401", description = "Unauthorized")
     @ApiResponse(responseCode = "409", description = "User already exists")
     public void register(@RequestBody @Valid UserSingleRegisterRequest request) {
-        userService.register(request);
+        authService.register(request);
     }
 
     @PatchMapping("/change-password")
@@ -49,7 +50,25 @@ public class UserController {
     @ApiResponse(responseCode = "401", description = "Unauthorized")
     @PreAuthorize("isAuthenticated()")
     public void changePassword(@RequestBody @Valid UserChangePasswordRequest request) {
-        userService.changePassword(request);
+        authService.changePassword(request);
+    }
+
+    @PostMapping("/request-reset-password")
+    @Operation(summary = "Request password reset", description = "Request reset password by sending email")
+    @ApiResponse(responseCode = "200", description = "Successfully changed password")
+    @ApiResponse(responseCode = "400", description = "Invalid request")
+    @ApiResponse(responseCode = "404", description = "Email not found")
+    public void resetPassword(@RequestParam String email) {
+        authService.requestPasswordReset(email);
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(summary = "Reset password", description = "Reset password by token")
+    @ApiResponse(responseCode = "200", description = "Successfully changed password")
+    @ApiResponse(responseCode = "400", description = "Invalid request")
+    @ApiResponse(responseCode = "404", description = "Email not found")
+    public void handlePasswordReset(@RequestParam String token, @RequestBody StringAsJSON newPassword) {
+        authService.resetPassword(token, newPassword.getValue());
     }
 
     @PatchMapping("/change-username")
@@ -122,6 +141,7 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Successfully logged out")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
     @PreAuthorize("isAuthenticated()")
-    public void logout() {
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        authService.logoutUser(request, response);
     }
 }

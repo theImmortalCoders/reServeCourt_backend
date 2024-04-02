@@ -15,4 +15,11 @@ public class MailTemplateService {
         message.setVariable("name", name);
         emailSendingUtil.sendEmailWithHtmlTemplate(email, "Witaj w ReServeCourt, " + name + "!", "welcome", message);
     }
+
+    public void sendPasswordResetEmail(String email, String token) {
+        var message = new Context();
+        message.setVariable("email", email);
+        message.setVariable("token", token);
+        emailSendingUtil.sendEmailWithHtmlTemplate(email, "Resetowanie hasła w ReServeCourt", "password_reset", message);
+    }
 }
