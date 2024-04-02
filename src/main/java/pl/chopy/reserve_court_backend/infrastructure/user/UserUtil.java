@@ -41,4 +41,11 @@ public class UserUtil {
                         () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, user.toString())
                 );
     }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+                );
+    }
 }
