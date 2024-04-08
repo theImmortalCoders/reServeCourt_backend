@@ -1,13 +1,15 @@
-
 # Tennis Court Reservation System
 
 ## Description
 
-This project aims to develop an application for managing tennis courts and reservations. The application will consist of two main panels: Client and Administration. In the Administration panel, the Admin will have the capability to manage tennis courts and reservations, including tasks such as adding, editing, and deleting. In the Client panel, users will be able to create and manage their reservations efficiently.
+This project aims to develop an application for managing tennis courts and reservations. The application will consist of
+two main panels: Client and Administration. In the Administration panel, the Admin will have the capability to manage
+tennis courts and reservations, including tasks such as adding, editing, and deleting. In the Client panel, users will
+be able to create and manage their reservations efficiently.
 
 ## Team Members
 
-- **Marcin Bator** (@marcinbator) 
+- **Marcin Bator** (@marcinbator)
 - **Igor Litwa** (@miszor03)
 - **Wiktor Mazur** (@ZegarekPL)
 - **Paweł Buczek** (@pablitoo1)

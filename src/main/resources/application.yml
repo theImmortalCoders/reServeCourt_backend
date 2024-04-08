@@ -1,1 +1,28 @@
-
+spring:
+  jpa:
+    defer-datasource-initialization: true
+  servlet:
+    multipart:
+      max-file-size: 26214400
+      max-request-size: 26214400
+  mail:
+    username: the.immortalcoders@gmail.com
+    password: njgtetfdtxxdwavs
+    host: smtp.gmail.com
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+server:
+  error:
+    include-message: always
+reserve-court:
+  security:
+    defaultRole: USER
+    privileges:
+      USER:
+      ADMIN:
+        - CAN_EDIT
