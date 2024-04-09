@@ -10,10 +10,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserChangePasswordRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleLoginRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleRegisterRequest;
+import pl.chopy.reserve_court_backend.infrastructure.user.dto.response.UserSingleResponse;
 import pl.chopy.reserve_court_backend.model.entity.User;
 import pl.chopy.reserve_court_backend.util.StringAsJSON;
 

@@ -28,9 +28,6 @@ public class User implements UserDetails {
     private String surname;
     private LocalDate birthDate;
     private String phoneNumber;
-    private String companyName;
-    private String address;
-    private String city;
 
     public enum UserRole {
         USER, ADMIN

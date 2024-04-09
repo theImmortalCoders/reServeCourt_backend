@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapper;
-import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserSingleResponse;
+import pl.chopy.reserve_court_backend.infrastructure.user.dto.response.UserSingleResponse;
 import pl.chopy.reserve_court_backend.model.entity.User;
 import pl.chopy.reserve_court_backend.model.entity.repository.UserRepository;
 

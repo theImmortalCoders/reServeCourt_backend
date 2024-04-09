@@ -1,4 +1,4 @@
-package pl.chopy.reserve_court_backend.infrastructure.user.dto;
+package pl.chopy.reserve_court_backend.infrastructure.user.dto.response;
 
 import lombok.Data;
 import pl.chopy.reserve_court_backend.model.entity.User;
@@ -15,7 +15,4 @@ public class UserSingleResponse {
     private User.UserRole role;
     private boolean isActive;
     private LocalDate birthDate;
-    private String companyName;
-    private String address;
-    private String city;
 }
