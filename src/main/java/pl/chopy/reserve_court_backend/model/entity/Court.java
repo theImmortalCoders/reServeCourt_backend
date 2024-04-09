@@ -20,7 +20,7 @@ public class Court {
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "club_id")
     private Club club;
-    @ManyToMany(cascade = CascadeType.REMOVE)
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "court")
     private List<Reservation> reservations = new ArrayList<>();
     @Enumerated(EnumType.STRING)
     private CourtType type;

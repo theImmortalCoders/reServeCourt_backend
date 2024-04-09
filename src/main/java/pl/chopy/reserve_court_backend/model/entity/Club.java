@@ -22,7 +22,7 @@ public class Club {
     @Type(JsonBinaryType.class)
     @Column(columnDefinition = "jsonb")
     private Location location;
-    @OneToMany(cascade = CascadeType.REMOVE)
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "club")
     private List<Court> courts = new ArrayList<>();
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "owner_id")
