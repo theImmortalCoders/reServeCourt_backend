@@ -5,7 +5,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
-import pl.chopy.reserve_court_backend.model.UserRole;
+import pl.chopy.reserve_court_backend.model.entity.User;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,7 +18,7 @@ public class ApplicationProps {
     private String defaultRole;
     private Map<String, Set<String>> privileges = new LinkedHashMap<>();
 
-    public Set<SimpleGrantedAuthority> getPrivileges(UserRole role) {
+    public Set<SimpleGrantedAuthority> getPrivileges(User.UserRole role) {
         return Option
                 .of(privileges.get(role.toString()))
                 .map(Collection::stream)

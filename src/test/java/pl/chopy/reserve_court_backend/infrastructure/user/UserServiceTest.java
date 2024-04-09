@@ -24,11 +24,9 @@ import pl.chopy.reserve_court_backend.infrastructure.mail.MailTemplateService;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapper;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapperImpl;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserSingleResponse;
-import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.CourtOwnerSingleBecomeRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserChangePasswordRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleLoginRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleRegisterRequest;
-import pl.chopy.reserve_court_backend.model.UserRole;
 import pl.chopy.reserve_court_backend.model.entity.User;
 import pl.chopy.reserve_court_backend.model.entity.repository.PasswordResetTokenRepository;
 import pl.chopy.reserve_court_backend.model.entity.repository.UserRepository;
@@ -101,7 +99,7 @@ public class UserServiceTest {
         userSingleResponse = new UserSingleResponse();
         userSingleResponse.setId(1L);
         userSingleResponse.setEmail("user@mail.com");
-        userSingleResponse.setRole(UserRole.USER);
+        userSingleResponse.setRole(User.UserRole.USER);
         userSingleResponse.setActive(true);
 
         when(userRepository.findByEmail("user@mail.com")).thenReturn(Optional.of(user));
@@ -206,9 +204,9 @@ public class UserServiceTest {
     public void shouldUpdateRole() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        userService.updateUserRole(1L, UserRole.ADMIN);
+        userService.updateUserRole(1L, User.UserRole.ADMIN);
 
-        assertEquals(UserRole.ADMIN, user.getRole());
+        assertEquals(User.UserRole.ADMIN, user.getRole());
     }
 
     @Test
@@ -229,18 +227,6 @@ public class UserServiceTest {
         userService.deleteAccount(request, response);
 
         verify(userRepository, times(1)).delete(any(User.class));
-    }
-
-    @Test
-    public void shouldBecomeCourtOwner() {
-        var ownerRequest = new CourtOwnerSingleBecomeRequest();
-        ownerRequest.setAddress("address");
-        ownerRequest.setCity("city");
-        ownerRequest.setCompanyName("company");
-
-        userService.becomeOwner(ownerRequest, request, response);
-
-        assertEquals(UserRole.OWNER, user.getRole());
     }
 
     @Test

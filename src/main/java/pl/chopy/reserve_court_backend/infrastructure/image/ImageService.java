@@ -10,7 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.infrastructure.image.dto.ImageMapper;
 import pl.chopy.reserve_court_backend.infrastructure.image.dto.ImageSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
-import pl.chopy.reserve_court_backend.model.UserRole;
 import pl.chopy.reserve_court_backend.model.entity.Image;
 import pl.chopy.reserve_court_backend.model.entity.User;
 import pl.chopy.reserve_court_backend.model.entity.repository.ImageRepository;
@@ -107,7 +106,7 @@ public class ImageService {
         User user = userUtil.getCurrentUser();
         Image image = getImageById(imageId);
 
-        if (!user.getId().equals(image.getAuthor().getId()) && !user.getRole().equals(UserRole.ADMIN)) {
+        if (!user.getId().equals(image.getAuthor().getId()) && !user.getRole().equals(User.UserRole.ADMIN)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot delete image you not own");
         }
 
