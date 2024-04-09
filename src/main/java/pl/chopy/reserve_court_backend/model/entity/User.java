@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import pl.chopy.reserve_court_backend.model.UserRole;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -32,6 +31,10 @@ public class User implements UserDetails {
     private String companyName;
     private String address;
     private String city;
+
+    public enum UserRole {
+        USER, ADMIN
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

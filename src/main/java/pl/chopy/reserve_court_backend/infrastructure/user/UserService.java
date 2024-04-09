@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapper;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserSingleResponse;
-import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.CourtOwnerSingleBecomeRequest;
-import pl.chopy.reserve_court_backend.model.UserRole;
 import pl.chopy.reserve_court_backend.model.entity.User;
 import pl.chopy.reserve_court_backend.model.entity.repository.UserRepository;
 
@@ -42,20 +40,7 @@ public class UserService {
         authService.logoutUser(request, response);
     }
 
-    public void becomeOwner(CourtOwnerSingleBecomeRequest ownerRequest, HttpServletRequest request, HttpServletResponse response) {
-        User user = userUtil.getCurrentUser();
-
-        user.setAddress(ownerRequest.getAddress());
-        user.setCity(ownerRequest.getCity());
-        user.setCompanyName(ownerRequest.getCompanyName());
-        user.setRole(UserRole.OWNER);
-
-        userUtil.saveUser(user);
-
-        authService.updateSecurityContext(request, response, user);
-    }
-
-    void updateUserRole(Long userId, UserRole newRole) {
+    void updateUserRole(Long userId, User.UserRole newRole) {
         User user = userUtil.getUserById(userId);
 
         user.setRole(newRole);
