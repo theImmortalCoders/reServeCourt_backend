@@ -3,6 +3,7 @@ package pl.chopy.reserve_court_backend.infrastructure.club.dto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import pl.chopy.reserve_court_backend.infrastructure.club.dto.response.ClubShortResponse;
+import pl.chopy.reserve_court_backend.infrastructure.club.dto.response.ClubSingleResponse;
 import pl.chopy.reserve_court_backend.model.entity.Club;
 
 @Mapper
@@ -11,4 +12,6 @@ public interface ClubMapper {
     Club map(ClubSingleRequest request);
 
     ClubShortResponse shortMap(Club request);
+
+    ClubSingleResponse map(Club request);
 }
