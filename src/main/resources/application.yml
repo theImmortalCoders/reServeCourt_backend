@@ -22,7 +22,3 @@ server:
 reserve-court:
   security:
     defaultRole: USER
-    privileges:
-      USER:
-      ADMIN:
-        - CAN_EDIT
