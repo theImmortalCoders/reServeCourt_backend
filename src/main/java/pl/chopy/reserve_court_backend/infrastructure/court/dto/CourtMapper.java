@@ -8,7 +8,6 @@ import pl.chopy.reserve_court_backend.model.entity.Court;
 
 @Mapper
 public interface CourtMapper {
-    @Mapping(target = "club", ignore = true)
     Court map(CourtSingleRequest request);
 
     @Mapping(target = "image", ignore = true)

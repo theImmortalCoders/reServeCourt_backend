@@ -10,7 +10,6 @@ import java.util.List;
 public class CourtSingleRequest {
     private String name;
     private String description;
-    private Long clubId;
     private Court.CourtType type;
     private Court.Surface surface;
     private Location location;

@@ -99,6 +99,8 @@ public class ClubService {
                     if (user == null || user.getRole().equals(User.UserRole.USER)) {
                         c.setCourts(filterCourtsByNotClosed(c));
                     }
+
+
                 })
                 .get();
     }

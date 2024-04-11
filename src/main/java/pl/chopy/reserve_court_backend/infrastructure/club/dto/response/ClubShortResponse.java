@@ -12,4 +12,5 @@ public class ClubShortResponse {
     private ImageSingleResponse logo;
     private Location location;
     private double rating;
+    private int courtsAmount;
 }
