@@ -3,6 +3,7 @@ package pl.chopy.reserve_court_backend.model.entity;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.annotations.Type;
 import pl.chopy.reserve_court_backend.model.Location;
 
@@ -19,6 +20,7 @@ public class Court {
     private String description;
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "club_id")
+    @ToString.Exclude
     private Club club;
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "court")
     private List<Reservation> reservations = new ArrayList<>();

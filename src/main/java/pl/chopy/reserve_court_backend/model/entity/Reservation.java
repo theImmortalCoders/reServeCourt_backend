@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -13,6 +14,7 @@ public class Reservation {
     @GeneratedValue
     private Long id;
     @ManyToOne
+    @ToString.Exclude
     private Court court;
     private boolean active = true;
 }
