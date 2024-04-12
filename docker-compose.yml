@@ -9,8 +9,21 @@ services:
     ports:
       - "5430:5432"
     volumes:
-      - type: volume
-        source: pgvolume
-        target: /var/lib/postgresql/data
+      - pgvolume:/var/lib/postgresql/data
+  rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq
+      RABBITMQ_DEFAULT_PASS: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitvolume:/var/lib/rabbitmq
+    networks:
+      - lan
 volumes:
   pgvolume:
+  rabbitvolume:
+networks:
+  lan:
