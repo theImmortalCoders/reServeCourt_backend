@@ -12,20 +12,20 @@ import java.util.List;
 @Entity
 @Data
 public class Club {
-    @Id
-    @GeneratedValue
-    private Long id;
-    private String name;
-    private String description;
-    @ManyToOne
-    private Image logo;
-    @Type(JsonBinaryType.class)
-    @Column(columnDefinition = "jsonb")
-    private Location location;
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "club")
-    private List<Court> courts = new ArrayList<>();
-    @ManyToOne(cascade = CascadeType.DETACH)
-    @JoinColumn(name = "owner_id")
-    private User owner;
-    private double rating = 0.0;
+	@Id
+	@GeneratedValue
+	private Long id;
+	private String name;
+	private String description;
+	@ManyToOne
+	private Image logo;
+	@Type(JsonBinaryType.class)
+	@Column(columnDefinition = "jsonb")
+	private Location location;
+	@OneToMany(cascade = CascadeType.REMOVE, mappedBy = "club")
+	private List<Court> courts = new ArrayList<>();
+	@ManyToOne(cascade = CascadeType.DETACH)
+	@JoinColumn(name = "owner_id")
+	private User owner;
+	private double rating = 0.0;
 }

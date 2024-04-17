@@ -15,22 +15,22 @@ import org.thymeleaf.context.Context;
 @Service
 @AllArgsConstructor
 public class MailSendingUtil {
-    private final JavaMailSender mailSender;
-    private final TemplateEngine templateEngine;
+	private final JavaMailSender mailSender;
+	private final TemplateEngine templateEngine;
 
-    public void sendEmailWithHtmlTemplate(String to, String subject, String templateName, Context context) {
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
-        try {
-            helper.setTo(to);
-            helper.setFrom("the.immortalcoders@gmail.com");
-            helper.setSubject(subject);
-            String htmlContent = templateEngine.process(templateName, context);
-            helper.setText(htmlContent, true);
-            mailSender.send(mimeMessage);
-        } catch (MessagingException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email '" + to + "' does not exist.");
-        }
-    }
+	public void sendEmailWithHtmlTemplate(String to, String subject, String templateName, Context context) {
+		MimeMessage mimeMessage = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
+		try {
+			helper.setTo(to);
+			helper.setFrom("the.immortalcoders@gmail.com");
+			helper.setSubject(subject);
+			String htmlContent = templateEngine.process(templateName, context);
+			helper.setText(htmlContent, true);
+			mailSender.send(mimeMessage);
+		} catch (MessagingException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email '" + to + "' does not exist.");
+		}
+	}
 
 }

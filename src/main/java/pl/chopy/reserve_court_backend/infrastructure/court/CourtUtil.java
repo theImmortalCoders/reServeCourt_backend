@@ -11,19 +11,19 @@ import pl.chopy.reserve_court_backend.model.entity.repository.CourtRepository;
 @Component
 @AllArgsConstructor
 public class CourtUtil {
-    private final CourtRepository courtRepository;
+	private final CourtRepository courtRepository;
 
-    public Court getById(Long courtId) {
-        return courtRepository.findById(courtId)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Court not found")
-                );
-    }
+	public Court getById(Long courtId) {
+		return courtRepository.findById(courtId)
+				.orElseThrow(
+						() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Court not found")
+				);
+	}
 
-    public void save(Court court) {
-        Option.of(courtRepository.save(court))
-                .getOrElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, court.toString())
-                );
-    }
+	public void save(Court court) {
+		Option.of(courtRepository.save(court))
+				.getOrElseThrow(
+						() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, court.toString())
+				);
+	}
 }

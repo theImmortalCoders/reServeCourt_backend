@@ -14,49 +14,49 @@ import pl.chopy.reserve_court_backend.model.entity.Club;
 
 @Mapper
 public interface ClubMapper {
-    @Mapping(target = "logo", ignore = true)
-    Club map(ClubSingleRequest request);
+	@Mapping(target = "logo", ignore = true)
+	Club map(ClubSingleRequest request);
 
-    default ClubShortResponse shortMap(Club request) {
-        ImageMapper imageMapper = new ImageMapperImpl();
+	default ClubShortResponse shortMap(Club request) {
+		ImageMapper imageMapper = new ImageMapperImpl();
 
-        var response = new ClubShortResponse();
-        response.setId(request.getId());
-        response.setName(request.getName());
-        response.setDescription(request.getDescription());
-        response.setLogo(imageMapper.map(request.getLogo()));
-        response.setRating(request.getRating());
-        response.setCourtsAmount(request.getCourts().size());
-        response.setLocation(request.getLocation());
+		var response = new ClubShortResponse();
+		response.setId(request.getId());
+		response.setName(request.getName());
+		response.setDescription(request.getDescription());
+		response.setLogo(imageMapper.map(request.getLogo()));
+		response.setRating(request.getRating());
+		response.setCourtsAmount(request.getCourts().size());
+		response.setLocation(request.getLocation());
 
-        return response;
-    }
+		return response;
+	}
 
-    default ClubSingleResponse map(Club request) {
-        ImageMapper imageMapper = new ImageMapperImpl();
-        CourtMapper courtMapper = new CourtMapperImpl();
-        UserMapper userMapper = new UserMapperImpl();
+	default ClubSingleResponse map(Club request) {
+		ImageMapper imageMapper = new ImageMapperImpl();
+		CourtMapper courtMapper = new CourtMapperImpl();
+		UserMapper userMapper = new UserMapperImpl();
 
-        var response = new ClubSingleResponse();
-        response.setId(request.getId());
-        response.setName(request.getName());
-        response.setDescription(request.getDescription());
-        response.setLocation(request.getLocation());
-        response.setRating(request.getRating());
-        response.setLogo(imageMapper.map(request.getLogo()));
-        response.setCourts(request.getCourts()
-                .stream()
-                .map(c -> {
-                    var courtResponse = courtMapper.shortMap(c);
-                    courtResponse.setImage(imageMapper.map(
-                            c.getImages().get(0)
-                    ));
-                    return courtResponse;
-                })
-                .toList()
-        );
-        response.setOwner(userMapper.shortMap(request.getOwner()));
+		var response = new ClubSingleResponse();
+		response.setId(request.getId());
+		response.setName(request.getName());
+		response.setDescription(request.getDescription());
+		response.setLocation(request.getLocation());
+		response.setRating(request.getRating());
+		response.setLogo(imageMapper.map(request.getLogo()));
+		response.setCourts(request.getCourts()
+				.stream()
+				.map(c -> {
+					var courtResponse = courtMapper.shortMap(c);
+					courtResponse.setImage(imageMapper.map(
+							c.getImages().get(0)
+					));
+					return courtResponse;
+				})
+				.toList()
+		);
+		response.setOwner(userMapper.shortMap(request.getOwner()));
 
-        return response;
-    }
+		return response;
+	}
 }

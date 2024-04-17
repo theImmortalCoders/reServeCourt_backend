@@ -32,56 +32,56 @@ import static org.springframework.security.web.header.writers.ClearSiteDataHeade
 @EnableMethodSecurity
 @AllArgsConstructor
 public class SecurityConfig {
-    private final ApplicationProps applicationProps;
+	private final ApplicationProps applicationProps;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .cors(Customizer.withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .authorizeHttpRequests(request -> request
-                        .anyRequest()
-                        .permitAll())
-                .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-                .logout((logout) -> logout
-                        .logoutUrl("/api/logout")
-                        .addLogoutHandler(new HeaderWriterLogoutHandler(new ClearSiteDataHeaderWriter(COOKIES)))
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                        .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
-                );
-        return http.build();
-    }
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http
+				.cors(Customizer.withDefaults())
+				.csrf(AbstractHttpConfigurer::disable)
+				.sessionManagement(session -> session
+						.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+				.authorizeHttpRequests(request -> request
+						.anyRequest()
+						.permitAll())
+				.exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+				.logout((logout) -> logout
+						.logoutUrl("/api/logout")
+						.addLogoutHandler(new HeaderWriterLogoutHandler(new ClearSiteDataHeaderWriter(COOKIES)))
+						.invalidateHttpSession(true)
+						.deleteCookies("JSESSIONID")
+						.logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
+				);
+		return http.build();
+	}
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(@NonNull CorsRegistry registry) {
-                registry
-                        .addMapping("/**")
-                        .allowedOrigins(
-                                applicationProps.getAllowedOrigins().toArray(new String[0]))
-                        .allowCredentials(true)
-                        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE");
-            }
-        };
-    }
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(@NonNull CorsRegistry registry) {
+				registry
+						.addMapping("/**")
+						.allowedOrigins(
+								applicationProps.getAllowedOrigins().toArray(new String[0]))
+						.allowCredentials(true)
+						.allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE");
+			}
+		};
+	}
 
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(16);
-    }
+	@Bean
+	public BCryptPasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder(16);
+	}
 
-    @Bean
-    public SecurityContextRepository securityContextRepository() {
-        return new HttpSessionSecurityContextRepository();
-    }
+	@Bean
+	public SecurityContextRepository securityContextRepository() {
+		return new HttpSessionSecurityContextRepository();
+	}
 
-    @Bean
-    public SecurityContextHolderStrategy securityContextStrategy() {
-        return SecurityContextHolder.getContextHolderStrategy();
-    }
+	@Bean
+	public SecurityContextHolderStrategy securityContextStrategy() {
+		return SecurityContextHolder.getContextHolderStrategy();
+	}
 }

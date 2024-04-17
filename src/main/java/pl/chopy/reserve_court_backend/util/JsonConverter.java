@@ -13,31 +13,31 @@ import java.util.List;
 @Converter
 public class JsonConverter implements AttributeConverter<List<String>, String> {
 
-    private final static ObjectMapper objectMapper = new ObjectMapper();
-    private final TypeReference<List<String>> listTypeRef = new TypeReference<>() {
-    };
+	private final static ObjectMapper objectMapper = new ObjectMapper();
+	private final TypeReference<List<String>> listTypeRef = new TypeReference<>() {
+	};
 
-    @Override
-    public String convertToDatabaseColumn(List<String> data) {
-        if (null == data) {
-            return null;
-        }
-        try {
-            return objectMapper.writeValueAsString(data);
-        } catch (JsonProcessingException ex) {
-            return null;
-        }
-    }
+	@Override
+	public String convertToDatabaseColumn(List<String> data) {
+		if (null == data) {
+			return null;
+		}
+		try {
+			return objectMapper.writeValueAsString(data);
+		} catch (JsonProcessingException ex) {
+			return null;
+		}
+	}
 
-    @Override
-    public List<String> convertToEntityAttribute(String dbData) {
-        if (null == dbData || dbData.isEmpty()) {
-            return Collections.emptyList();
-        }
-        try {
-            return objectMapper.readValue(dbData, listTypeRef);
-        } catch (IOException ex) {
-            return null;
-        }
-    }
+	@Override
+	public List<String> convertToEntityAttribute(String dbData) {
+		if (null == dbData || dbData.isEmpty()) {
+			return Collections.emptyList();
+		}
+		try {
+			return objectMapper.readValue(dbData, listTypeRef);
+		} catch (IOException ex) {
+			return null;
+		}
+	}
 }

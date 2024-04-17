@@ -7,5 +7,5 @@ import pl.chopy.reserve_court_backend.model.entity.User;
 import java.util.List;
 
 public interface ImageRepository extends JpaRepository<Image, Long> {
-    List<Image> findAllByAuthor(User author);
+	List<Image> findAllByAuthor(User author);
 }

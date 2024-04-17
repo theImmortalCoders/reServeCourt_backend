@@ -13,14 +13,14 @@ import java.util.List;
 @Component
 @AllArgsConstructor
 public class ImageUtil {
-    private final ImageRepository imageRepository;
+	private final ImageRepository imageRepository;
 
-    public Image getImageById(Long imageId) {
-        return Option.ofOptional(imageRepository.findById(imageId))
-                .getOrElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Image " + imageId + " not found."));
-    }
+	public Image getImageById(Long imageId) {
+		return Option.ofOptional(imageRepository.findById(imageId))
+				.getOrElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Image " + imageId + " not found."));
+	}
 
-    public List<Image> getImagesByIds(List<Long> imagesIds) {
-        return imageRepository.findAllById(imagesIds);
-    }
+	public List<Image> getImagesByIds(List<Long> imagesIds) {
+		return imageRepository.findAllById(imagesIds);
+	}
 }
