@@ -1,11 +1,11 @@
 package pl.chopy.reserve_court_backend.infrastructure.notification.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
-public class NotificationSingleRequest {
-	private Long receiverId;
+public class NotificationSingleResponse {
+	private Long id;
 	private String message;
+	private Long receiverId;
+	private boolean read;
 }

@@ -22,7 +22,6 @@ import pl.chopy.reserve_court_backend.model.entity.User;
 import pl.chopy.reserve_court_backend.model.entity.repository.ClubRepository;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -45,7 +44,7 @@ public class ClubService {
 				})
 				.peek(clubUtil::save);
 
-		notificationUtil.sendManagementNotification(List.of(currentUser.getId()), "Dodano klub " + request.getName() + "!");
+		notificationUtil.sendManagementNotification(currentUser.getId(), "Dodano klub " + request.getName() + "!");
 	}
 
 	void update(Long clubId, ClubSingleRequest request) {

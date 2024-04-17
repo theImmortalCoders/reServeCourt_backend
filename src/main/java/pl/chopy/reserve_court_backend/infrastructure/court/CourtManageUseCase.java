@@ -17,8 +17,6 @@ import pl.chopy.reserve_court_backend.model.entity.Court;
 import pl.chopy.reserve_court_backend.model.entity.Reservation;
 import pl.chopy.reserve_court_backend.model.entity.repository.CourtRepository;
 
-import java.util.List;
-
 @Component
 @AllArgsConstructor
 public class CourtManageUseCase {
@@ -45,7 +43,7 @@ public class CourtManageUseCase {
 				});
 
 		notificationUtil.sendManagementNotification(
-				List.of(userUtil.getCurrentUser().getId()),
+				userUtil.getCurrentUser().getId(),
 				"Dodano kort " + request.getName() + " do klubu " + club.getName() + "."
 		);
 	}
