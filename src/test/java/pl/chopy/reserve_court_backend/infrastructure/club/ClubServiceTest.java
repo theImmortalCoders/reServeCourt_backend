@@ -15,6 +15,7 @@ import pl.chopy.reserve_court_backend.infrastructure.club.dto.ClubMapperImpl;
 import pl.chopy.reserve_court_backend.infrastructure.club.dto.ClubSingleRequest;
 import pl.chopy.reserve_court_backend.infrastructure.club.dto.response.ClubSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.image.ImageUtil;
+import pl.chopy.reserve_court_backend.infrastructure.notification.NotificationUtil;
 import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
 import pl.chopy.reserve_court_backend.model.entity.*;
 import pl.chopy.reserve_court_backend.model.entity.repository.ClubRepository;
@@ -43,6 +44,8 @@ public class ClubServiceTest {
 	private final ClubMapper clubMapper = new ClubMapperImpl();
 	@Mock
 	private UserUtil userUtil;
+	@Mock
+	private NotificationUtil notificationUtil;
 	@InjectMocks
 	private ClubService clubService;
 

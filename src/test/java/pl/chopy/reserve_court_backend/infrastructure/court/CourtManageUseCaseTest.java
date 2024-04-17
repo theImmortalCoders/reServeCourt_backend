@@ -16,10 +16,9 @@ import pl.chopy.reserve_court_backend.infrastructure.court.dto.CourtMapperImpl;
 import pl.chopy.reserve_court_backend.infrastructure.court.dto.CourtSingleRequest;
 import pl.chopy.reserve_court_backend.infrastructure.court.dto.response.CourtSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.image.ImageUtil;
-import pl.chopy.reserve_court_backend.model.entity.Club;
-import pl.chopy.reserve_court_backend.model.entity.Court;
-import pl.chopy.reserve_court_backend.model.entity.Image;
-import pl.chopy.reserve_court_backend.model.entity.Reservation;
+import pl.chopy.reserve_court_backend.infrastructure.notification.NotificationUtil;
+import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
+import pl.chopy.reserve_court_backend.model.entity.*;
 import pl.chopy.reserve_court_backend.model.entity.repository.CourtRepository;
 
 import java.util.ArrayList;
@@ -37,6 +36,7 @@ public class CourtManageUseCaseTest {
 	private Court court = new Court();
 	private Club club = new Club();
 	private Image image = new Image();
+	private User user = new User();
 	private final CourtRepository courtRepository = mock(CourtRepository.class);
 	@Spy
 	private CourtUtil courtUtil = new CourtUtil(courtRepository);
@@ -46,6 +46,10 @@ public class CourtManageUseCaseTest {
 	private final CourtMapper courtMapper = new CourtMapperImpl();
 	@Mock
 	private ImageUtil imageUtil;
+	@Mock
+	private NotificationUtil notificationUtil;
+	@Mock
+	private UserUtil userUtil;
 	@InjectMocks
 	private CourtManageUseCase courtManageUseCase;
 
@@ -55,10 +59,13 @@ public class CourtManageUseCaseTest {
 
 		image.setId(1L);
 
+		user.setId(1L);
+
 		when(imageUtil.getImagesByIds(new ArrayList<>(List.of(1L)))).thenReturn(new ArrayList<>(List.of(image)));
 		when(clubUtil.getById(1L)).thenReturn(club);
 		when(courtRepository.save(any(Court.class))).thenReturn(court);
 		when(courtRepository.findById(any(Long.class))).thenReturn(Optional.of(court));
+		when(userUtil.getCurrentUser()).thenReturn(user);
 	}
 
 	@Test
