@@ -15,7 +15,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import pl.chopy.reserve_court_backend.infrastructure.mail.MailTemplateService;
+import pl.chopy.reserve_court_backend.infrastructure.mail.MailUtil;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapper;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserChangePasswordRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleLoginRequest;
@@ -38,7 +38,7 @@ public class AuthService {
 	private final PasswordResetTokenRepository passwordResetTokenRepository;
 	private final UserUtil userUtil;
 	private final BCryptPasswordEncoder passwordEncoder;
-	private final MailTemplateService mailTemplateService;
+	private final MailUtil mailUtil;
 	private final UserMapper userMapper;
 	private final SecurityContextHolderStrategy securityContextHolderStrategy;
 	private final SecurityContextRepository securityContextRepository;
@@ -67,7 +67,7 @@ public class AuthService {
 		user.setHashedPassword(passwordEncoder.encode(request.getPassword()));
 
 		userUtil.saveUser(user);
-		mailTemplateService.sendWelcomeEmail(user.getEmail(), user.getName());
+		mailUtil.sendWelcomeEmail(user.getEmail(), user.getName());
 	}
 
 	void changePassword(@NotNull UserChangePasswordRequest request) {
@@ -90,7 +90,7 @@ public class AuthService {
 		token.setExpiring(LocalDateTime.now().plusMinutes(10));
 		passwordResetTokenRepository.save(token);
 
-		mailTemplateService.sendPasswordResetEmail(user.getEmail(), token.getToken());
+		mailUtil.sendPasswordResetEmail(user.getEmail(), token.getToken());
 	}
 
 	public void resetPassword(String tokenValue, String newPassword) {

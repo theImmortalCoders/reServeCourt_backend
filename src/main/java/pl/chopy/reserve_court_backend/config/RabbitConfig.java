@@ -20,6 +20,11 @@ public class RabbitConfig {
 	}
 
 	@Bean
+	public Queue mailingQueue() {
+		return new Queue("mailingQueue");
+	}
+
+	@Bean
 	public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
 		RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
 		rabbitTemplate.setMessageConverter(messageConverter);
