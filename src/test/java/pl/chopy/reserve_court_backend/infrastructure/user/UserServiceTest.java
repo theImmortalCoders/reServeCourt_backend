@@ -20,7 +20,7 @@ import org.springframework.security.test.context.TestSecurityContextHolderStrate
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.server.ResponseStatusException;
-import pl.chopy.reserve_court_backend.infrastructure.mail.MailTemplateService;
+import pl.chopy.reserve_court_backend.infrastructure.mail.MailUtil;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapper;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapperImpl;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserChangePasswordRequest;
@@ -60,7 +60,7 @@ public class UserServiceTest {
 	@Mock
 	private HttpServletResponse response;
 	@Mock
-	private MailTemplateService mailTemplateService;
+	private MailUtil mailUtil;
 	@Mock
 	private SecurityContextHolderStrategy securityContextHolderStrategy = new TestSecurityContextHolderStrategyAdapter();
 	@Mock
@@ -71,7 +71,7 @@ public class UserServiceTest {
 	@Spy
 	private final UserUtil userUtil = new UserUtil(userRepository);
 	@Spy
-	private final AuthService authService = new AuthService(userRepository, passwordResetTokenRepository, userUtil, passwordEncoder, mailTemplateService, userMapper, securityContextHolderStrategy, securityContextRepository);
+	private final AuthService authService = new AuthService(userRepository, passwordResetTokenRepository, userUtil, passwordEncoder, mailUtil, userMapper, securityContextHolderStrategy, securityContextRepository);
 
 	@InjectMocks
 	private UserService userService;
