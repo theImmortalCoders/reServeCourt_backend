@@ -1,31 +1,39 @@
 package pl.chopy.reserve_court_backend.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketMessage;
-import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Controller;
+import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationMapper;
+import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSingleResponse;
 import pl.chopy.reserve_court_backend.model.entity.repository.NotificationRepository;
 
-import java.io.IOException;
+import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-@Component
 @AllArgsConstructor
-public class WebSocketHandler extends TextWebSocketHandler {
+@Controller
+public class WebSocketHandler {
+
 	private final NotificationRepository notificationRepository;
+	private final NotificationMapper notificationMapper;
+	private final SimpMessagingTemplate simpMessagingTemplate;
 	private final ObjectMapper objectMapper;
 
-	@Override
-	public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws IOException {
-		String receivedMessage = (String) message.getPayload();
-		String jsonData = objectMapper.writeValueAsString(notificationRepository.findAll());
-		session.sendMessage(new TextMessage(jsonData));
-	}
+	@MessageMapping("/broadcast")
+	public void broadcastMessage() {
+		List<NotificationSingleResponse> notifications = notificationRepository
+				.findAll()
+				.stream()
+				.map(notificationMapper::map)
+				.toList();
 
-	@Override
-	public void afterConnectionEstablished(WebSocketSession session) throws IOException {
+		try {
+			simpMessagingTemplate.convertAndSend("/topic/reply", objectMapper.writeValueAsString(notifications));
+		} catch (JsonProcessingException ignored) {
+		}
+		System.out.println(notifications);
 	}
 }
+
