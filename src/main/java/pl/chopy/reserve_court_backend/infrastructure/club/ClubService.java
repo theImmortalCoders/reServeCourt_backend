@@ -20,6 +20,7 @@ import pl.chopy.reserve_court_backend.model.entity.Club;
 import pl.chopy.reserve_court_backend.model.entity.Reservation;
 import pl.chopy.reserve_court_backend.model.entity.User;
 import pl.chopy.reserve_court_backend.model.entity.repository.ClubRepository;
+import pl.chopy.reserve_court_backend.util.WebSocketHandler;
 
 import java.util.ArrayList;
 
@@ -32,6 +33,7 @@ public class ClubService {
 	private final ClubRepository clubRepository;
 	private final UserUtil userUtil;
 	private final NotificationUtil notificationUtil;
+	private final WebSocketHandler webSocketHandler;
 
 	void add(ClubSingleRequest request) {
 		User currentUser = userUtil.getCurrentUser();
