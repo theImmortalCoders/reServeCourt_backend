@@ -20,6 +20,9 @@ spring:
           starttls:
             enable: true
 server:
+  servlet:
+    session:
+      timeout: 1m
   error:
     include-message: always
 reserve-court:
