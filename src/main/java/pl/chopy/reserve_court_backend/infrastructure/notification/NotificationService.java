@@ -1,7 +1,6 @@
 package pl.chopy.reserve_court_backend.infrastructure.notification;
 
 import io.vavr.control.Option;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.http.HttpStatus;
@@ -11,14 +10,13 @@ import pl.chopy.reserve_court_backend.infrastructure.notification.dto.Notificati
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSingleRequest;
 import pl.chopy.reserve_court_backend.model.entity.Notification;
 import pl.chopy.reserve_court_backend.model.entity.repository.NotificationRepository;
-import pl.chopy.reserve_court_backend.util.WebSocketHandler;
 
 @Service
 @AllArgsConstructor
 public class NotificationService {
 	private final NotificationMapper notificationMapper;
 	private final NotificationRepository notificationRepository;
-	private final WebSocketHandler webSocketHandler;
+	private final WebsocketController websocketController;
 
 	@RabbitListener(queues = "managementQueue")
 	public void listen(NotificationSingleRequest request) {
@@ -26,7 +24,7 @@ public class NotificationService {
 				.map(notificationMapper::map)
 				.peek(this::save);
 
-		webSocketHandler.broadcastMessage();
+		//websocketController.broadcastMessage();
 	}
 
 	//
