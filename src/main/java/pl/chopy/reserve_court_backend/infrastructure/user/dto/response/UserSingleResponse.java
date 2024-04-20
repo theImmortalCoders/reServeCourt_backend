@@ -1,7 +1,7 @@
-package pl.chopy.reserve_court_backend.infrastructure.user.dto;
+package pl.chopy.reserve_court_backend.infrastructure.user.dto.response;
 
 import lombok.Data;
-import pl.chopy.reserve_court_backend.model.UserRole;
+import pl.chopy.reserve_court_backend.model.entity.User;
 
 import java.time.LocalDate;
 
@@ -12,10 +12,7 @@ public class UserSingleResponse {
     private String surname;
     private String email;
     private String phoneNumber;
-    private UserRole role;
+    private User.UserRole role;
     private boolean isActive;
     private LocalDate birthDate;
-    private String companyName;
-    private String address;
-    private String city;
 }

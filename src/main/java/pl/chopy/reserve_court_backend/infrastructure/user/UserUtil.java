@@ -28,6 +28,14 @@ public class UserUtil {
                 );
     }
 
+    public User getCurrentUserOrNull() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
+            return getCurrentUser();
+        }
+        return null;
+    }
+
     public User getUserById(Long userId) {
         return Option.ofOptional(userRepository.findById(userId))
                 .getOrElseThrow(() ->

@@ -13,7 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.context.SecurityContextRepository;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.infrastructure.mail.MailTemplateService;
