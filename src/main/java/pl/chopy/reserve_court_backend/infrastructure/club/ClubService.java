@@ -17,7 +17,6 @@ import pl.chopy.reserve_court_backend.infrastructure.image.ImageUtil;
 import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
 import pl.chopy.reserve_court_backend.model.DaysOpen;
 import pl.chopy.reserve_court_backend.model.entity.Club;
-import pl.chopy.reserve_court_backend.model.entity.Reservation;
 import pl.chopy.reserve_court_backend.model.entity.User;
 import pl.chopy.reserve_court_backend.model.entity.repository.ClubRepository;
 
@@ -71,7 +70,7 @@ public class ClubService {
 				.filter(c -> !
 						c.getReservations()
 								.stream()
-								.filter(Reservation::isActive)
+								.filter(r -> !r.isCanceled())
 								.toList()
 								.isEmpty())
 				.toList()
@@ -117,7 +116,7 @@ public class ClubService {
 	//
 
 	private static void checkOpenDaysValid(DaysOpen daysOpen) {
-		if (!daysOpen.checkValid()) {
+		if (!daysOpen.checkIsValid()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Open days is invalid");
 		}
 	}

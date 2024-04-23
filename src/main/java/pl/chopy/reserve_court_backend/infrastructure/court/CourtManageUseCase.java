@@ -12,7 +12,6 @@ import pl.chopy.reserve_court_backend.infrastructure.court.dto.response.CourtSin
 import pl.chopy.reserve_court_backend.infrastructure.image.ImageUtil;
 import pl.chopy.reserve_court_backend.model.entity.Club;
 import pl.chopy.reserve_court_backend.model.entity.Court;
-import pl.chopy.reserve_court_backend.model.entity.Reservation;
 import pl.chopy.reserve_court_backend.model.entity.repository.CourtRepository;
 
 @Component
@@ -77,7 +76,7 @@ public class CourtManageUseCase {
 	private boolean hasActiveReservations(Court court) {
 		return !Option.of(court)
 				.filter(c -> !c.getReservations().stream()
-						.filter(Reservation::isActive)
+						.filter(r -> !r.isCanceled())
 						.toList()
 						.isEmpty())
 				.toList()
