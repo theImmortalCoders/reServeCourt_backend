@@ -15,6 +15,7 @@ import pl.chopy.reserve_court_backend.infrastructure.club.dto.response.ClubSingl
 import pl.chopy.reserve_court_backend.infrastructure.court.dto.response.CourtShortResponse;
 import pl.chopy.reserve_court_backend.infrastructure.image.ImageUtil;
 import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
+import pl.chopy.reserve_court_backend.model.DaysOpen;
 import pl.chopy.reserve_court_backend.model.entity.Club;
 import pl.chopy.reserve_court_backend.model.entity.Reservation;
 import pl.chopy.reserve_court_backend.model.entity.User;
@@ -37,6 +38,10 @@ public class ClubService {
 				.peek(c -> {
 					updateLogo(request, c);
 					c.setOwner(userUtil.getCurrentUser());
+					if (c.getDaysOpen() == null) {
+						c.setDaysOpen(new DaysOpen());
+					}
+					checkOpenDaysValid(c.getDaysOpen());
 				})
 				.peek(clubUtil::save);
 	}
@@ -49,6 +54,10 @@ public class ClubService {
 					c.setName(request.getName());
 					c.setDescription(request.getDescription());
 					c.setLocation(request.getLocation());
+					if (c.getDaysOpen() == null) {
+						c.setDaysOpen(new DaysOpen());
+					}
+					checkOpenDaysValid(c.getDaysOpen());
 					updateLogo(request, c);
 				})
 				.peek(clubUtil::save);
@@ -106,6 +115,12 @@ public class ClubService {
 	}
 
 	//
+
+	private static void checkOpenDaysValid(DaysOpen daysOpen) {
+		if (!daysOpen.checkValid()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Open days is invalid");
+		}
+	}
 
 	private static ArrayList<CourtShortResponse> filterCourtsByNotClosed(ClubSingleResponse c) {
 		return new ArrayList<>(c.getCourts()

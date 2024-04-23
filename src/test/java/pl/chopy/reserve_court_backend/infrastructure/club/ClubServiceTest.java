@@ -16,6 +16,7 @@ import pl.chopy.reserve_court_backend.infrastructure.club.dto.ClubSingleRequest;
 import pl.chopy.reserve_court_backend.infrastructure.club.dto.response.ClubSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.image.ImageUtil;
 import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
+import pl.chopy.reserve_court_backend.model.DaysOpen;
 import pl.chopy.reserve_court_backend.model.entity.*;
 import pl.chopy.reserve_court_backend.model.entity.repository.ClubRepository;
 
@@ -68,6 +69,7 @@ public class ClubServiceTest {
 	public void shouldAddClub() {
 		var request = new ClubSingleRequest();
 		request.setLogoId(1L);
+		request.setDaysOpen(new DaysOpen());
 
 		clubService.add(request);
 
@@ -78,6 +80,7 @@ public class ClubServiceTest {
 	public void shouldUpdateClub() {
 		var request = new ClubSingleRequest();
 		request.setLogoId(1L);
+		request.setDaysOpen(new DaysOpen());
 
 		clubService.update(1L, request);
 
@@ -110,6 +113,7 @@ public class ClubServiceTest {
 		var response = new ClubSingleResponse();
 		response.setId(1L);
 		response.setCourts(new ArrayList<>());
+		response.setDaysOpen(new DaysOpen());
 
 		assertEquals(response, clubService.getDetails(1L));
 	}

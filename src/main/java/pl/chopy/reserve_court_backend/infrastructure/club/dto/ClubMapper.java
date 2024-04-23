@@ -58,6 +58,7 @@ public interface ClubMapper {
 				.toList()
 		);
 		response.setOwner(userMapper.shortMap(request.getOwner()));
+		response.setDaysOpen(request.getDaysOpen());
 
 		return response;
 	}
