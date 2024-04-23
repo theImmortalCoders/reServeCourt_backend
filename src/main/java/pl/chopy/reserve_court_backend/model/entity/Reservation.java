@@ -10,11 +10,11 @@ import lombok.ToString;
 @Entity
 @Data
 public class Reservation {
-    @Id
-    @GeneratedValue
-    private Long id;
-    @ManyToOne
-    @ToString.Exclude
-    private Court court;
-    private boolean active = true;
+	@Id
+	@GeneratedValue
+	private Long id;
+	@ManyToOne
+	@ToString.Exclude
+	private Court court;
+	private boolean active = true;
 }

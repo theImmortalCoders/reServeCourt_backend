@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 @Entity
 @Data
 public class PasswordResetToken {
-    @Id
-    @GeneratedValue
-    private Long id;
-    private String email;
-    private String token;
-    private boolean used;
-    private LocalDateTime expiring;
+	@Id
+	@GeneratedValue
+	private Long id;
+	private String email;
+	private String token;
+	private boolean used;
+	private LocalDateTime expiring;
 }

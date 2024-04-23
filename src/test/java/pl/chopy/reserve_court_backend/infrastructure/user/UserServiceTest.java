@@ -42,213 +42,213 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class UserServiceTest {
-    private User user;
-    private UserSingleResponse userSingleResponse;
-    private UserSingleRegisterRequest userSingleRegisterRequest;
-    private UserSingleLoginRequest userSingleLoginRequest;
+	private User user;
+	private UserSingleResponse userSingleResponse;
+	private UserSingleRegisterRequest userSingleRegisterRequest;
+	private UserSingleLoginRequest userSingleLoginRequest;
 
-    @Spy
-    private final UserMapper userMapper = new UserMapperImpl();
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+	@Spy
+	private final UserMapper userMapper = new UserMapperImpl();
+	private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    @Mock
-    private Authentication authentication;
-    @Mock
-    private SecurityContext securityContext;
-    @Mock
-    private HttpServletRequest request;
-    @Mock
-    private HttpServletResponse response;
-    @Mock
-    private MailTemplateService mailTemplateService;
-    @Mock
-    private SecurityContextHolderStrategy securityContextHolderStrategy = new TestSecurityContextHolderStrategyAdapter();
-    @Mock
-    private SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
+	@Mock
+	private Authentication authentication;
+	@Mock
+	private SecurityContext securityContext;
+	@Mock
+	private HttpServletRequest request;
+	@Mock
+	private HttpServletResponse response;
+	@Mock
+	private MailTemplateService mailTemplateService;
+	@Mock
+	private SecurityContextHolderStrategy securityContextHolderStrategy = new TestSecurityContextHolderStrategyAdapter();
+	@Mock
+	private SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
 
-    private final UserRepository userRepository = mock(UserRepository.class);
-    private final PasswordResetTokenRepository passwordResetTokenRepository = mock(PasswordResetTokenRepository.class);
-    @Spy
-    private final UserUtil userUtil = new UserUtil(userRepository);
-    @Spy
-    private final AuthService authService = new AuthService(userRepository, passwordResetTokenRepository, userUtil, passwordEncoder, mailTemplateService, userMapper, securityContextHolderStrategy, securityContextRepository);
+	private final UserRepository userRepository = mock(UserRepository.class);
+	private final PasswordResetTokenRepository passwordResetTokenRepository = mock(PasswordResetTokenRepository.class);
+	@Spy
+	private final UserUtil userUtil = new UserUtil(userRepository);
+	@Spy
+	private final AuthService authService = new AuthService(userRepository, passwordResetTokenRepository, userUtil, passwordEncoder, mailTemplateService, userMapper, securityContextHolderStrategy, securityContextRepository);
 
-    @InjectMocks
-    private UserService userService;
+	@InjectMocks
+	private UserService userService;
 
-    @BeforeEach
-    public void setUp() {
-        SecurityContextHolder.setContext(securityContext);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(securityContextHolderStrategy.createEmptyContext()).thenReturn(securityContext);
+	@BeforeEach
+	public void setUp() {
+		SecurityContextHolder.setContext(securityContext);
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		when(securityContextHolderStrategy.createEmptyContext()).thenReturn(securityContext);
 
-        user = new User();
-        user.setId(1L);
-        user.setEmail("user@mail.com");
-        user.setHashedPassword(passwordEncoder.encode("password"));
+		user = new User();
+		user.setId(1L);
+		user.setEmail("user@mail.com");
+		user.setHashedPassword(passwordEncoder.encode("password"));
 
-        userSingleRegisterRequest = new UserSingleRegisterRequest();
-        userSingleRegisterRequest.setEmail("user@mail.com");
-        userSingleRegisterRequest.setPassword("password");
-        userSingleRegisterRequest.setBirthDate(LocalDate.of(2000, 1, 1));
+		userSingleRegisterRequest = new UserSingleRegisterRequest();
+		userSingleRegisterRequest.setEmail("user@mail.com");
+		userSingleRegisterRequest.setPassword("password");
+		userSingleRegisterRequest.setBirthDate(LocalDate.of(2000, 1, 1));
 
-        userSingleLoginRequest = new UserSingleLoginRequest();
-        userSingleLoginRequest.setEmail("user@mail.com");
-        userSingleLoginRequest.setPassword("password");
+		userSingleLoginRequest = new UserSingleLoginRequest();
+		userSingleLoginRequest.setEmail("user@mail.com");
+		userSingleLoginRequest.setPassword("password");
 
-        userSingleResponse = new UserSingleResponse();
-        userSingleResponse.setId(1L);
-        userSingleResponse.setEmail("user@mail.com");
-        userSingleResponse.setRole(User.UserRole.USER);
-        userSingleResponse.setActive(true);
+		userSingleResponse = new UserSingleResponse();
+		userSingleResponse.setId(1L);
+		userSingleResponse.setEmail("user@mail.com");
+		userSingleResponse.setRole(User.UserRole.USER);
+		userSingleResponse.setActive(true);
 
-        when(userRepository.findByEmail("user@mail.com")).thenReturn(Optional.of(user));
-        when(userRepository.save(any(User.class))).thenReturn(user);
-        when(SecurityContextHolder.getContext().getAuthentication().getName())
-                .thenReturn("user@mail.com");
-    }
+		when(userRepository.findByEmail("user@mail.com")).thenReturn(Optional.of(user));
+		when(userRepository.save(any(User.class))).thenReturn(user);
+		when(SecurityContextHolder.getContext().getAuthentication().getName())
+				.thenReturn("user@mail.com");
+	}
 
-    @Test
-    public void shouldGetCurrentUser() {
-        User currentuser = userUtil.getCurrentUser();
+	@Test
+	public void shouldGetCurrentUser() {
+		User currentuser = userUtil.getCurrentUser();
 
-        assertEquals(user, currentuser);
-    }
+		assertEquals(user, currentuser);
+	}
 
-    @Test
-    public void shouldGetCurrentUserResponse() {
-        UserSingleResponse currentUser = userService.getCurrentUserResponse();
+	@Test
+	public void shouldGetCurrentUserResponse() {
+		UserSingleResponse currentUser = userService.getCurrentUserResponse();
 
-        assertEquals(userSingleResponse, currentUser);
-    }
+		assertEquals(userSingleResponse, currentUser);
+	}
 
-    @Test
-    public void shouldThrowNotFoundExceptionWhenGetCurrentUser() {
-        when(userRepository.findByEmail("user@mail.com"))
-                .thenReturn(Optional.empty());
-        when(SecurityContextHolder.getContext().getAuthentication().getName())
-                .thenReturn("user");
+	@Test
+	public void shouldThrowNotFoundExceptionWhenGetCurrentUser() {
+		when(userRepository.findByEmail("user@mail.com"))
+				.thenReturn(Optional.empty());
+		when(SecurityContextHolder.getContext().getAuthentication().getName())
+				.thenReturn("user");
 
-        assertThrows(
-                ResponseStatusException.class,
-                userUtil::getCurrentUser
-        );
-    }
+		assertThrows(
+				ResponseStatusException.class,
+				userUtil::getCurrentUser
+		);
+	}
 
-    @Test
-    public void shouldThrowUnauthorizedExceptionWhenGetCurrentUser() {
-        when(SecurityContextHolder.getContext().getAuthentication())
-                .thenReturn(null);
+	@Test
+	public void shouldThrowUnauthorizedExceptionWhenGetCurrentUser() {
+		when(SecurityContextHolder.getContext().getAuthentication())
+				.thenReturn(null);
 
-        assertThrows(
-                ResponseStatusException.class,
-                userUtil::getCurrentUser
-        );
-    }
+		assertThrows(
+				ResponseStatusException.class,
+				userUtil::getCurrentUser
+		);
+	}
 
-    @Test
-    public void shouldThrowExceptionWhenAuthenticateUserWithInvalidCredentials() {
-        userSingleLoginRequest.setPassword("wrong_password");
+	@Test
+	public void shouldThrowExceptionWhenAuthenticateUserWithInvalidCredentials() {
+		userSingleLoginRequest.setPassword("wrong_password");
 
-        assertThrows(ResponseStatusException.class, () -> authService.authenticate(userSingleLoginRequest, request, response));
-    }
+		assertThrows(ResponseStatusException.class, () -> authService.authenticate(userSingleLoginRequest, request, response));
+	}
 
-    @Test
-    public void shouldThrowBadRequestWhenRegisterUser() {
-        userSingleRegisterRequest.setBirthDate(LocalDate.of(2012, 1, 1));
+	@Test
+	public void shouldThrowBadRequestWhenRegisterUser() {
+		userSingleRegisterRequest.setBirthDate(LocalDate.of(2012, 1, 1));
 
-        assertThrows(
-                ResponseStatusException.class,
-                () -> authService.register(userSingleRegisterRequest)
-        );
-    }
+		assertThrows(
+				ResponseStatusException.class,
+				() -> authService.register(userSingleRegisterRequest)
+		);
+	}
 
-    @Test
-    public void shouldThrowConflictExceptionWhenRegisterUserWithExistingUsername() {
-        assertThrows(ResponseStatusException.class, () -> authService.register(userSingleRegisterRequest));
-    }
+	@Test
+	public void shouldThrowConflictExceptionWhenRegisterUserWithExistingUsername() {
+		assertThrows(ResponseStatusException.class, () -> authService.register(userSingleRegisterRequest));
+	}
 
-    @Test
-    public void shouldChangePassword() {
-        UserChangePasswordRequest request = new UserChangePasswordRequest();
-        request.setOldPassword("password");
-        request.setNewPassword("new_password");
+	@Test
+	public void shouldChangePassword() {
+		UserChangePasswordRequest request = new UserChangePasswordRequest();
+		request.setOldPassword("password");
+		request.setNewPassword("new_password");
 
-        authService.changePassword(request);
+		authService.changePassword(request);
 
-        verify(userRepository, times(1)).save(any(User.class));
-    }
+		verify(userRepository, times(1)).save(any(User.class));
+	}
 
-    @Test
-    public void shouldThrowBadRequestExceptionWhenChangePasswordWithInvalidOldPassword() {
-        UserChangePasswordRequest request = new UserChangePasswordRequest();
-        request.setOldPassword("wrong_password");
-        request.setNewPassword("new_password");
+	@Test
+	public void shouldThrowBadRequestExceptionWhenChangePasswordWithInvalidOldPassword() {
+		UserChangePasswordRequest request = new UserChangePasswordRequest();
+		request.setOldPassword("wrong_password");
+		request.setNewPassword("new_password");
 
-        assertThrows(ResponseStatusException.class, () -> authService.changePassword(request));
-    }
+		assertThrows(ResponseStatusException.class, () -> authService.changePassword(request));
+	}
 
-    @Test
-    public void shouldChangeEmail() {
-        when(userRepository.save(user)).thenReturn(user);
+	@Test
+	public void shouldChangeEmail() {
+		when(userRepository.save(user)).thenReturn(user);
 
-        StringAsJSON usernameRequest = new StringAsJSON();
-        usernameRequest.setValue("new_user@mail.com");
-        userService.changeEmail(usernameRequest.getValue(), request, response);
+		StringAsJSON usernameRequest = new StringAsJSON();
+		usernameRequest.setValue("new_user@mail.com");
+		userService.changeEmail(usernameRequest.getValue(), request, response);
 
-        verify(userRepository, times(1)).save(any(User.class));
-        verify(request, times(2)).getSession(false);
-    }
+		verify(userRepository, times(1)).save(any(User.class));
+		verify(request, times(2)).getSession(false);
+	}
 
-    @Test
-    public void shouldUpdateRole() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+	@Test
+	public void shouldUpdateRole() {
+		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        userService.updateUserRole(1L, User.UserRole.ADMIN);
+		userService.updateUserRole(1L, User.UserRole.ADMIN);
 
-        assertEquals(User.UserRole.ADMIN, user.getRole());
-    }
+		assertEquals(User.UserRole.ADMIN, user.getRole());
+	}
 
-    @Test
-    public void shouldThrowNotFoundExceptionWhenChangeUsernameOfNonExistingUser() {
-        when(userRepository.findByEmail("user@mail.com")).thenReturn(Optional.empty());
+	@Test
+	public void shouldThrowNotFoundExceptionWhenChangeUsernameOfNonExistingUser() {
+		when(userRepository.findByEmail("user@mail.com")).thenReturn(Optional.empty());
 
-        StringAsJSON emailRequest = new StringAsJSON();
-        emailRequest.setValue("new_user@mail.com");
+		StringAsJSON emailRequest = new StringAsJSON();
+		emailRequest.setValue("new_user@mail.com");
 
-        assertThrows(
-                ResponseStatusException.class,
-                () -> userService.changeEmail(emailRequest.getValue(), request, response)
-        );
-    }
+		assertThrows(
+				ResponseStatusException.class,
+				() -> userService.changeEmail(emailRequest.getValue(), request, response)
+		);
+	}
 
-    @Test
-    public void shouldDeleteUser() {
-        userService.deleteAccount(request, response);
+	@Test
+	public void shouldDeleteUser() {
+		userService.deleteAccount(request, response);
 
-        verify(userRepository, times(1)).delete(any(User.class));
-    }
+		verify(userRepository, times(1)).delete(any(User.class));
+	}
 
-    @Test
-    public void shouldThrowBadRequestWhenBanUser() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+	@Test
+	public void shouldThrowBadRequestWhenBanUser() {
+		when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        assertThrows(
-                ResponseStatusException.class,
-                () -> userService.banUser(1L)
-        );
-    }
+		assertThrows(
+				ResponseStatusException.class,
+				() -> userService.banUser(1L)
+		);
+	}
 
-    @Test
-    public void shouldBanUser() {
-        User user2 = new User();
-        user2.setId(2L);
-        user2.setEmail("user2@mail.com");
+	@Test
+	public void shouldBanUser() {
+		User user2 = new User();
+		user2.setId(2L);
+		user2.setEmail("user2@mail.com");
 
-        when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
+		when(userRepository.findById(2L)).thenReturn(Optional.of(user2));
 
-        userService.banUser(2L);
+		userService.banUser(2L);
 
-        assertFalse(user2.isActive());
-    }
+		assertFalse(user2.isActive());
+	}
 }

@@ -6,6 +6,6 @@ import pl.chopy.reserve_court_backend.model.entity.Image;
 
 @Mapper
 public interface ImageMapper {
-    @Mapping(target = "authorId", source = "author.id")
-    ImageSingleResponse map(Image request);
+	@Mapping(target = "authorId", source = "author.id")
+	ImageSingleResponse map(Image request);
 }

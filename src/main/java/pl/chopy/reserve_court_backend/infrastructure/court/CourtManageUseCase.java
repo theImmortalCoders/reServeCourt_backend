@@ -18,61 +18,69 @@ import pl.chopy.reserve_court_backend.model.entity.repository.CourtRepository;
 @Component
 @AllArgsConstructor
 public class CourtManageUseCase {
-    private final CourtUtil courtUtil;
-    private final ClubUtil clubUtil;
-    private final CourtMapper courtMapper;
-    private final CourtRepository courtRepository;
-    private final ImageUtil imageUtil;
+	private final CourtUtil courtUtil;
+	private final ClubUtil clubUtil;
+	private final CourtMapper courtMapper;
+	private final CourtRepository courtRepository;
+	private final ImageUtil imageUtil;
 
-    public void add(Long clubId, CourtSingleRequest request) {
-        Club club = clubUtil.getById(clubId);
+	public void add(Long clubId, CourtSingleRequest request) {
+		Club club = clubUtil.getById(clubId);
 
-        Option.of(request)
-                .map(courtMapper::map)
-                .peek(court -> {
-                    court.setClub(club);
-                    court.setImages(imageUtil.getImagesByIds(request.getImagesIds()));
-                    courtUtil.save(court);
+		Option.of(request)
+				.map(courtMapper::map)
+				.peek(court -> {
+					court.setClub(club);
+					court.setImages(imageUtil.getImagesByIds(request.getImagesIds()));
+					courtUtil.save(court);
 
-                    club.getCourts().add(court);
-                    clubUtil.save(club);
-                });
-    }
+					club.getCourts().add(court);
+					clubUtil.save(club);
+				});
+	}
 
-    public void update(Long courtId, CourtSingleRequest request) {
-        Court court = courtUtil.getById(courtId);
+	public void update(Long courtId, CourtSingleRequest request) {
+		Court court = courtUtil.getById(courtId);
 
-        courtMapper.update(court, request);
-        court.setImages(imageUtil.getImagesByIds(request.getImagesIds()));
+		courtMapper.update(court, request);
+		court.setImages(imageUtil.getImagesByIds(request.getImagesIds()));
 
-        courtUtil.save(court);
-    }
+		courtUtil.save(court);
+	}
 
-    public void delete(Long courtId) {
-        Court court = courtUtil.getById(courtId);
+	public void delete(Long courtId) {
+		Court court = courtUtil.getById(courtId);
 
-        if (hasActiveReservations(court)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Court has active reservations");
-        }
+		if (hasActiveReservations(court)) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Court has active reservations");
+		}
 
-        courtRepository.delete(court);
-    }
+		courtRepository.delete(court);
+	}
 
-    public CourtSingleResponse getDetails(Long courtId) {
-        return courtMapper.map(
-                courtUtil.getById(courtId)
-        );
-    }
+	public CourtSingleResponse getDetails(Long courtId) {
+		return courtMapper.map(
+				courtUtil.getById(courtId)
+		);
+	}
 
-    //
+	public void toggleClosed(Long courtId, boolean closed) {
+		Court court = courtUtil.getById(courtId);
+		court.setClosed(closed);
+		courtUtil.save(court);
 
-    private boolean hasActiveReservations(Court court) {
-        return !Option.of(court)
-                .filter(c -> !c.getReservations().stream()
-                        .filter(Reservation::isActive)
-                        .toList()
-                        .isEmpty())
-                .toList()
-                .isEmpty();
-    }
+		//todo cancel all reservations
+	}
+
+	//
+
+	private boolean hasActiveReservations(Court court) {
+		return !Option.of(court)
+				.filter(c -> !c.getReservations().stream()
+						.filter(Reservation::isActive)
+						.toList()
+						.isEmpty())
+				.toList()
+				.isEmpty();
+	}
 }

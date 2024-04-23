@@ -11,19 +11,19 @@ import pl.chopy.reserve_court_backend.model.entity.repository.ClubRepository;
 @Component
 @AllArgsConstructor
 public class ClubUtil {
-    private final ClubRepository clubRepository;
+	private final ClubRepository clubRepository;
 
-    public Club getById(Long clubId) {
-        return clubRepository.findById(clubId)
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Club not found")
-                );
-    }
+	public Club getById(Long clubId) {
+		return clubRepository.findById(clubId)
+				.orElseThrow(
+						() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Club not found")
+				);
+	}
 
-    public void save(Club club) {
-        Option.of(clubRepository.save(club))
-                .getOrElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, club.toString())
-                );
-    }
+	public void save(Club club) {
+		Option.of(clubRepository.save(club))
+				.getOrElseThrow(
+						() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, club.toString())
+				);
+	}
 }

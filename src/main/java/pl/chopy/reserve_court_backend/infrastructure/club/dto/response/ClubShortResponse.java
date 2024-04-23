@@ -6,11 +6,11 @@ import pl.chopy.reserve_court_backend.model.Location;
 
 @Data
 public class ClubShortResponse {
-    private Long id;
-    private String name;
-    private String description;
-    private ImageSingleResponse logo;
-    private Location location;
-    private double rating;
-    private int courtsAmount;
+	private Long id;
+	private String name;
+	private String description;
+	private ImageSingleResponse logo;
+	private Location location;
+	private double rating;
+	private int courtsAmount;
 }

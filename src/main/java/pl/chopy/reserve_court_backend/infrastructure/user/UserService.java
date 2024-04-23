@@ -15,46 +15,46 @@ import pl.chopy.reserve_court_backend.model.entity.repository.UserRepository;
 @Service
 @AllArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
-    private final UserUtil userUtil;
-    private final AuthService authService;
+	private final UserRepository userRepository;
+	private final UserMapper userMapper;
+	private final UserUtil userUtil;
+	private final AuthService authService;
 
-    UserSingleResponse getCurrentUserResponse() {
-        return userMapper.map(userUtil.getCurrentUser());
-    }
+	UserSingleResponse getCurrentUserResponse() {
+		return userMapper.map(userUtil.getCurrentUser());
+	}
 
-    void deleteAccount(HttpServletRequest request, HttpServletResponse response) {
-        User user = userUtil.getCurrentUser();
-        authService.logoutUser(request, response);
+	void deleteAccount(HttpServletRequest request, HttpServletResponse response) {
+		User user = userUtil.getCurrentUser();
+		authService.logoutUser(request, response);
 
-        userRepository.delete(user);
-    }
+		userRepository.delete(user);
+	}
 
-    void changeEmail(@NotNull String email, HttpServletRequest request, HttpServletResponse response) {
-        User user = userUtil.getCurrentUser();
+	void changeEmail(@NotNull String email, HttpServletRequest request, HttpServletResponse response) {
+		User user = userUtil.getCurrentUser();
 
-        user.setEmail(email);
-        userUtil.saveUser(user);
+		user.setEmail(email);
+		userUtil.saveUser(user);
 
-        authService.logoutUser(request, response);
-    }
+		authService.logoutUser(request, response);
+	}
 
-    void updateUserRole(Long userId, User.UserRole newRole) {
-        User user = userUtil.getUserById(userId);
+	void updateUserRole(Long userId, User.UserRole newRole) {
+		User user = userUtil.getUserById(userId);
 
-        user.setRole(newRole);
-        userUtil.saveUser(user);
-    }
+		user.setRole(newRole);
+		userUtil.saveUser(user);
+	}
 
-    void banUser(Long userId) {
-        User user = userUtil.getUserById(userId);
+	void banUser(Long userId) {
+		User user = userUtil.getUserById(userId);
 
-        if (user.getId().equals(userUtil.getCurrentUser().getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot ban yourself");
-        }
+		if (user.getId().equals(userUtil.getCurrentUser().getId())) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot ban yourself");
+		}
 
-        user.setActive(false);
-        userUtil.saveUser(user);
-    }
+		user.setActive(false);
+		userUtil.saveUser(user);
+	}
 }

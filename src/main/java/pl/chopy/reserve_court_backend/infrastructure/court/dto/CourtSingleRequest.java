@@ -8,10 +8,10 @@ import java.util.List;
 
 @Data
 public class CourtSingleRequest {
-    private String name;
-    private String description;
-    private Court.CourtType type;
-    private Court.Surface surface;
-    private Location location;
-    private List<Long> imagesIds;
+	private String name;
+	private String description;
+	private Court.CourtType type;
+	private Court.Surface surface;
+	private Location location;
+	private List<Long> imagesIds;
 }
