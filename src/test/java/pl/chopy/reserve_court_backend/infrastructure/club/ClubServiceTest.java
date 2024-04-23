@@ -31,86 +31,86 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class ClubServiceTest {
-    private Club club;
-    private Image image;
-    private User user;
-    private final ClubRepository clubRepository = mock(ClubRepository.class);
-    @Spy
-    private ClubUtil clubUtil = new ClubUtil(clubRepository);
-    @Mock
-    private ImageUtil imageUtil;
-    @Spy
-    private final ClubMapper clubMapper = new ClubMapperImpl();
-    @Mock
-    private UserUtil userUtil;
-    @InjectMocks
-    private ClubService clubService;
+	private Club club;
+	private Image image;
+	private User user;
+	private final ClubRepository clubRepository = mock(ClubRepository.class);
+	@Spy
+	private ClubUtil clubUtil = new ClubUtil(clubRepository);
+	@Mock
+	private ImageUtil imageUtil;
+	@Spy
+	private final ClubMapper clubMapper = new ClubMapperImpl();
+	@Mock
+	private UserUtil userUtil;
+	@InjectMocks
+	private ClubService clubService;
 
-    @BeforeEach
-    public void setUp() {
-        club = new Club();
-        club.setId(1L);
+	@BeforeEach
+	public void setUp() {
+		club = new Club();
+		club.setId(1L);
 
-        image = new Image();
-        image.setId(1L);
+		image = new Image();
+		image.setId(1L);
 
-        user = new User();
-        user.setId(1L);
+		user = new User();
+		user.setId(1L);
 
-        when(imageUtil.getImageById(1L)).thenReturn(image);
-        when(userUtil.getCurrentUserOrNull()).thenReturn(user);
-        when(userUtil.getCurrentUser()).thenReturn(user);
-        when(clubRepository.findById(1L)).thenReturn(Optional.of(club));
-        when(clubRepository.save(any(Club.class))).thenReturn(club);
-    }
+		when(imageUtil.getImageById(1L)).thenReturn(image);
+		when(userUtil.getCurrentUserOrNull()).thenReturn(user);
+		when(userUtil.getCurrentUser()).thenReturn(user);
+		when(clubRepository.findById(1L)).thenReturn(Optional.of(club));
+		when(clubRepository.save(any(Club.class))).thenReturn(club);
+	}
 
-    @Test
-    public void shouldAddClub() {
-        var request = new ClubSingleRequest();
-        request.setLogoId(1L);
+	@Test
+	public void shouldAddClub() {
+		var request = new ClubSingleRequest();
+		request.setLogoId(1L);
 
-        clubService.add(request);
+		clubService.add(request);
 
-        verify(clubRepository, times(1)).save(any(Club.class));
-    }
+		verify(clubRepository, times(1)).save(any(Club.class));
+	}
 
-    @Test
-    public void shouldUpdateClub() {
-        var request = new ClubSingleRequest();
-        request.setLogoId(1L);
+	@Test
+	public void shouldUpdateClub() {
+		var request = new ClubSingleRequest();
+		request.setLogoId(1L);
 
-        clubService.update(1L, request);
+		clubService.update(1L, request);
 
-        verify(clubRepository, times(1)).findById(1L);
-        verify(clubRepository, times(1)).save(any(Club.class));
-    }
+		verify(clubRepository, times(1)).findById(1L);
+		verify(clubRepository, times(1)).save(any(Club.class));
+	}
 
-    @Test
-    public void shouldDeleteClub() {
-        clubService.delete(1L);
+	@Test
+	public void shouldDeleteClub() {
+		clubService.delete(1L);
 
-        verify(clubRepository, times(1)).delete(any(Club.class));
-    }
+		verify(clubRepository, times(1)).delete(any(Club.class));
+	}
 
-    @Test
-    public void shouldThrowBadRequestWhenDeleteClub() {
-        var court = new Court();
-        var reservation = new Reservation();
-        court.setReservations(new ArrayList<>(List.of(reservation)));
-        club.getCourts().add(court);
+	@Test
+	public void shouldThrowBadRequestWhenDeleteClub() {
+		var court = new Court();
+		var reservation = new Reservation();
+		court.setReservations(new ArrayList<>(List.of(reservation)));
+		club.getCourts().add(court);
 
-        assertThrows(
-                ResponseStatusException.class,
-                () -> clubService.delete(1L)
-        );
-    }
+		assertThrows(
+				ResponseStatusException.class,
+				() -> clubService.delete(1L)
+		);
+	}
 
-    @Test
-    public void shouldGetDetails() {
-        var response = new ClubSingleResponse();
-        response.setId(1L);
-        response.setCourts(new ArrayList<>());
+	@Test
+	public void shouldGetDetails() {
+		var response = new ClubSingleResponse();
+		response.setId(1L);
+		response.setCourts(new ArrayList<>());
 
-        assertEquals(response, clubService.getDetails(1L));
-    }
+		assertEquals(response, clubService.getDetails(1L));
+	}
 }

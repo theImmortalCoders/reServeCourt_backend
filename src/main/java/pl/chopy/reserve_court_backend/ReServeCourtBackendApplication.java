@@ -11,8 +11,8 @@ import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServic
 @OpenAPIDefinition(info = @Info(title = "reServeCourt backend app documentation", description = "Author: Marcin Bator"))
 public class ReServeCourtBackendApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(ReServeCourtBackendApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(ReServeCourtBackendApplication.class, args);
+	}
 
 }

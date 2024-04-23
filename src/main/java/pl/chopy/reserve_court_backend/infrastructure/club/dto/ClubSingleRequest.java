@@ -5,8 +5,8 @@ import pl.chopy.reserve_court_backend.model.Location;
 
 @Data
 public class ClubSingleRequest {
-    private String name;
-    private String description;
-    private Location location;
-    private Long logoId;
+	private String name;
+	private String description;
+	private Location location;
+	private Long logoId;
 }

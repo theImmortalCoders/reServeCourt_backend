@@ -10,12 +10,12 @@ import java.util.List;
 
 @Data
 public class ClubSingleResponse {
-    private Long id;
-    private String name;
-    private String description;
-    private ImageSingleResponse logo;
-    private Location location;
-    private List<CourtShortResponse> courts;
-    private UserShortResponse owner;
-    private double rating;
+	private Long id;
+	private String name;
+	private String description;
+	private ImageSingleResponse logo;
+	private Location location;
+	private List<CourtShortResponse> courts;
+	private UserShortResponse owner;
+	private double rating;
 }
