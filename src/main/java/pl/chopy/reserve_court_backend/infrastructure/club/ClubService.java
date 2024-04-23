@@ -71,7 +71,7 @@ public class ClubService {
 				.filter(c -> !
 						c.getReservations()
 								.stream()
-								.filter(Reservation::isActive)
+								.filter(r -> !r.isCanceled())
 								.toList()
 								.isEmpty())
 				.toList()
@@ -117,7 +117,7 @@ public class ClubService {
 	//
 
 	private static void checkOpenDaysValid(DaysOpen daysOpen) {
-		if (!daysOpen.checkValid()) {
+		if (!daysOpen.checkIsValid()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Open days is invalid");
 		}
 	}
