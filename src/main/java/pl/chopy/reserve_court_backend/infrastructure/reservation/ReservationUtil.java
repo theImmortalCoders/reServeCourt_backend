@@ -5,8 +5,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
+import pl.chopy.reserve_court_backend.model.entity.Court;
 import pl.chopy.reserve_court_backend.model.entity.Reservation;
 import pl.chopy.reserve_court_backend.model.entity.repository.ReservationRepository;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 @AllArgsConstructor
@@ -25,5 +29,14 @@ public class ReservationUtil {
 				.getOrElseThrow(
 						() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, reservation.toString())
 				);
+	}
+
+	public List<Reservation> getAllActiveByCourt(Court court) {
+		return reservationRepository.findAllByCourt(court)
+				.stream()
+				.filter(r -> r.getTimeFrom().isAfter(LocalDateTime.now())
+						&& !r.isCanceled()
+				)
+				.toList();
 	}
 }

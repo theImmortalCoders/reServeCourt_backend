@@ -22,7 +22,12 @@ public class Reservation {
 	private boolean isConfirmed = false;
 	private boolean isCanceled = false;
 	private boolean reservedByOwner = false;
-	private LocalDateTime from;
-	private LocalDateTime to;
+	private LocalDateTime timeFrom;
+	private LocalDateTime timeTo;
 	private String message;
+
+	public boolean areReservationsConcurrent(Reservation other) {
+		return !(timeTo.isBefore(other.timeFrom) || timeFrom.isAfter(other.timeTo));
+	}
+
 }

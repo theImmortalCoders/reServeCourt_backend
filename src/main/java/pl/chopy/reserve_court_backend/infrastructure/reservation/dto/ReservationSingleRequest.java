@@ -6,9 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class ReservationSingleRequest {
-	private Long courtId;
-	private Long bookerId;
-	private LocalDateTime from;
-	private LocalDateTime to;
+	private LocalDateTime timeFrom;
+	private LocalDateTime timeTo;
 	private String message;
 }

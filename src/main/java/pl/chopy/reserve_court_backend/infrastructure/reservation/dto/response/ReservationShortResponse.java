@@ -10,6 +10,6 @@ public class ReservationShortResponse {
 	private boolean isConfirmed;
 	private boolean isCanceled;
 	private boolean reservedByOwner;
-	private LocalDateTime from;
-	private LocalDateTime to;
+	private LocalDateTime timeFrom;
+	private LocalDateTime timeTo;
 }
