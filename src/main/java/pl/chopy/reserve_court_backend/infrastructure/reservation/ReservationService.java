@@ -80,6 +80,27 @@ public class ReservationService {
 				.get();
 	}
 
+	public void cancel(Long reservationId) {
+		User booker = userUtil.getCurrentUser();
+		Reservation reservation = reservationUtil.getActiveById(reservationId);
+
+		if (!booker.getId().equals(reservation.getBooker().getId()) && booker.getRole().equals(User.UserRole.ADMIN)) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the booker or admin");
+		}
+
+		reservation.setCanceled(true);
+		reservationUtil.save(reservation);
+
+		//todo send mail to owner and booker
+	}
+
+	public void confirm(Long reservationId) {
+		Reservation reservation = reservationUtil.getActiveById(reservationId);
+
+		reservation.setConfirmed(true);
+		reservationUtil.save(reservation);
+	}
+
 	//
 
 	private void validate(Reservation reservation, boolean updateReservation) {

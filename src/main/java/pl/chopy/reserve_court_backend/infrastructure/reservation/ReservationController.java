@@ -39,5 +39,26 @@ public class ReservationController {
 		return ResponseEntity.ok(reservationService.update(request, reservationId));
 	}
 
+	@DeleteMapping("/{reservationId}")
+	@Operation(summary = "Cancel reservation (Logged-in, author or ADMIN only)")
+	@ApiResponse(responseCode = "200")
+	@ApiResponse(responseCode = "401")
+	@ApiResponse(responseCode = "403")
+	@ApiResponse(responseCode = "404")
+	@ApiResponse(responseCode = "400", description = "Reservation has already been completed")
+	@PreAuthorize("isAuthenticated()")
+	public void cancel(@PathVariable Long reservationId) {
+		reservationService.cancel(reservationId);
+	}
 
+	@PatchMapping("/{reservationId}")
+	@Operation(summary = "Confirm reservation (Admin)")
+	@ApiResponse(responseCode = "200")
+	@ApiResponse(responseCode = "401")
+	@ApiResponse(responseCode = "403")
+	@ApiResponse(responseCode = "404")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public void confirm(@PathVariable Long reservationId) {
+		reservationService.confirm(reservationId);
+	}
 }

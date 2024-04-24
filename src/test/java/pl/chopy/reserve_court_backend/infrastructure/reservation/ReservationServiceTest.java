@@ -160,4 +160,18 @@ public class ReservationServiceTest {
 
 		verify(reservationRepository, times(1)).save(any(Reservation.class));
 	}
+
+	@Test
+	public void shouldCancel() {
+		reservationService.cancel(1L);
+
+		verify(reservationRepository, times(1)).save(any(Reservation.class));
+	}
+
+	@Test
+	public void shouldConfirm() {
+		reservationService.confirm(1L);
+
+		verify(reservationRepository, times(1)).save(any(Reservation.class));
+	}
 }

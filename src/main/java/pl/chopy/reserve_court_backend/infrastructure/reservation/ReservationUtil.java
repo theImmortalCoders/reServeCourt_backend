@@ -25,6 +25,14 @@ public class ReservationUtil {
 				);
 	}
 
+	public Reservation getActiveById(Long reservationId) {
+		return Option.of(getById(reservationId))
+				.filter(r -> !r.isCanceled() && r.getTimeFrom().isAfter(LocalDateTime.now()))
+				.getOrElseThrow(
+						() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found")
+				);
+	}
+
 	public void save(Reservation reservation) {
 		Option.of(reservationRepository.save(reservation))
 				.getOrElseThrow(
