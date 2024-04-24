@@ -26,4 +26,16 @@ public class ReservationController {
 	public ResponseEntity<ReservationSingleResponse> reserve(@RequestBody ReservationSingleRequest request, @RequestParam Long courtId) {
 		return ResponseEntity.ok(reservationService.reserve(request, courtId));
 	}
+
+	@PutMapping("/{reservationId}")
+	@Operation(summary = "Edit reservation (Logged-in, author only)")
+	@ApiResponse(responseCode = "200")
+	@ApiResponse(responseCode = "401")
+	@ApiResponse(responseCode = "403")
+	@ApiResponse(responseCode = "404")
+	@ApiResponse(responseCode = "400", description = "Various messages available")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<ReservationSingleResponse> update(@RequestBody ReservationSingleRequest request, @PathVariable Long reservationId) {
+		return ResponseEntity.ok(reservationService.update(request, reservationId));
+	}
 }

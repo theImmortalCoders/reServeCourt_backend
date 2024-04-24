@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -61,6 +62,8 @@ public class ReservationServiceTest {
 		reservation.setId(1L);
 		reservation.setTimeFrom(LocalDateTime.of(LocalDateTime.now().plusYears(1).getYear(), 4, 23, 10, 0));
 		reservation.setTimeTo(reservation.getTimeFrom().plusHours(1));
+		reservation.setBooker(user);
+		reservation.setCourt(court);
 
 		user.setId(1L);
 		user.setRole(User.UserRole.USER);
@@ -74,6 +77,7 @@ public class ReservationServiceTest {
 		when(userUtil.getCurrentUser()).thenReturn(user);
 		when(courtUtil.getById(1L)).thenReturn(court);
 		when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
+		when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
 	}
 
 	@Test
@@ -144,5 +148,16 @@ public class ReservationServiceTest {
 				ResponseStatusException.class,
 				() -> reservationService.reserve(request, 1L)
 		);
+	}
+
+	@Test
+	public void shouldUpdate() {
+		var request = new ReservationSingleRequest();
+		request.setTimeFrom(reservation.getTimeFrom());
+		request.setTimeTo(reservation.getTimeTo());
+
+		reservationService.update(request, 1L);
+
+		verify(reservationRepository, times(1)).save(any(Reservation.class));
 	}
 }

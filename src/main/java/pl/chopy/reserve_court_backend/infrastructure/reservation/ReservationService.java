@@ -19,6 +19,8 @@ import pl.chopy.reserve_court_backend.model.entity.User;
 import pl.chopy.reserve_court_backend.model.entity.repository.ReservationRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -45,7 +47,7 @@ public class ReservationService {
 						r.setConfirmed(true);
 					}
 				})
-				.peek(this::validate)
+				.peek(r -> validate(r, false))
 				.peek(r -> {
 					reservationUtil.save(r);
 					court.getReservations().add(r);
@@ -55,9 +57,30 @@ public class ReservationService {
 				.get();
 	}
 
+	public ReservationSingleResponse update(ReservationSingleRequest request, Long reservationId) {
+		User booker = userUtil.getCurrentUser();
+		Reservation reservation = reservationUtil.getById(reservationId);
+
+		if (!booker.getId().equals(reservation.getBooker().getId())) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the booker");
+		}
+
+		return Option.of(reservation)
+				.peek(r -> {
+					r.setTimeFrom(request.getTimeFrom());
+					r.setTimeTo(request.getTimeTo());
+					r.setMessage(request.getMessage());
+					r.setConfirmed(false);
+				})
+				.peek(r -> validate(r, true))
+				.peek(reservationUtil::save)
+				.map(reservationMapper::map)
+				.get();
+	}
+
 	//
 
-	private void validate(Reservation reservation) {
+	private void validate(Reservation reservation, boolean updateReservation) {
 		Court court = reservation.getCourt();
 		Club club = court.getClub();
 
@@ -70,13 +93,28 @@ public class ReservationService {
 		if (!club.getDaysOpen().checkIsDateIntervalInOpeningHours(reservation.getTimeFrom().plusMinutes(1), reservation.getTimeTo().minusMinutes(1))) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reservation time not matching club opening hours");
 		}
-		if (!isCourtFreeInHours(reservation, court)) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Court is already occupied in desired time.");
+		if (updateReservation) {
+			if (!isCourtFreeInHoursDespiteCurrent(reservation, court)) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Court is already occupied in desired time.");
+			}
+		} else {
+			if (!isCourtFreeInHours(reservation, court)) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Court is already occupied in desired time.");
+			}
 		}
 	}
 
 	private boolean isCourtFreeInHours(Reservation reservation, Court court) {
 		for (var r : reservationUtil.getAllActiveByCourt(court)) {
+			if (r.areReservationsConcurrent(reservation)) return false;
+		}
+		return true;
+	}
+
+	private boolean isCourtFreeInHoursDespiteCurrent(Reservation reservation, Court court) {
+		List<Reservation> reservations = new ArrayList<>(reservationUtil.getAllActiveByCourt(court));
+		reservations.removeIf(r -> r.getId().equals(reservation.getId()));
+		for (var r : reservations) {
 			if (r.areReservationsConcurrent(reservation)) return false;
 		}
 		return true;
