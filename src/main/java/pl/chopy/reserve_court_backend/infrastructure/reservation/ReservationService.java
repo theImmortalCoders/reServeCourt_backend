@@ -10,6 +10,7 @@ import pl.chopy.reserve_court_backend.infrastructure.court.CourtUtil;
 import pl.chopy.reserve_court_backend.infrastructure.mail.MailTemplateService;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.dto.ReservationMapper;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.dto.ReservationSingleRequest;
+import pl.chopy.reserve_court_backend.infrastructure.reservation.dto.response.ReservationShortResponse;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.dto.response.ReservationSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
 import pl.chopy.reserve_court_backend.model.entity.Club;
@@ -84,9 +85,7 @@ public class ReservationService {
 		User booker = userUtil.getCurrentUser();
 		Reservation reservation = reservationUtil.getActiveById(reservationId);
 
-		if (!booker.getId().equals(reservation.getBooker().getId()) && booker.getRole().equals(User.UserRole.ADMIN)) {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the booker or admin");
-		}
+		checkIfAdminOrBooker(booker, reservation);
 
 		reservation.setCanceled(true);
 		reservationUtil.save(reservation);
@@ -101,7 +100,36 @@ public class ReservationService {
 		reservationUtil.save(reservation);
 	}
 
+	public List<ReservationShortResponse> getByCourtWithFilters(Long courtId, LocalDateTime from, LocalDateTime to) {
+		return reservationRepository.findAllByCourtWithFilters(courtId, from, to)
+				.stream()
+				.map(reservationMapper::shortMap)
+				.toList();
+	}
+
+	public ReservationSingleResponse getDetails(Long reservationId) {
+		User booker = userUtil.getCurrentUser();
+		Reservation reservation = reservationUtil.getActiveById(reservationId);
+
+		checkIfAdminOrBooker(booker, reservation);
+
+		return reservationMapper.map(reservation);
+	}
+
+	public List<ReservationShortResponse> getUpcomingByClubAndConfirmed(Long clubId, Boolean confirmed) {
+		return reservationRepository.findAllByClubAndDateFromWithFilter(clubId, LocalDateTime.now(), confirmed)
+				.stream()
+				.map(reservationMapper::shortMap)
+				.toList();
+	}
+
 	//
+
+	private static void checkIfAdminOrBooker(User booker, Reservation reservation) {
+		if (!booker.getId().equals(reservation.getBooker().getId()) && booker.getRole().equals(User.UserRole.ADMIN)) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the booker or admin");
+		}
+	}
 
 	private void validate(Reservation reservation, boolean updateReservation) {
 		Court court = reservation.getCourt();
