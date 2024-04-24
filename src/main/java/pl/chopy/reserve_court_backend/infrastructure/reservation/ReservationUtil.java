@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.model.entity.Court;
 import pl.chopy.reserve_court_backend.model.entity.Reservation;
+import pl.chopy.reserve_court_backend.model.entity.User;
 import pl.chopy.reserve_court_backend.model.entity.repository.ReservationRepository;
 
 import java.time.LocalDateTime;
@@ -38,5 +39,17 @@ public class ReservationUtil {
 						&& !r.isCanceled()
 				)
 				.toList();
+	}
+
+	public void cancel(Long reservationId, User user) {
+		Reservation reservation = getById(reservationId);
+
+		if (!user.getRole().equals(User.UserRole.ADMIN) && !reservation.getBooker().equals(user)) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the booker");
+		}
+
+		reservation.setCanceled(true);
+		//todo send mail to owner and booker
+		reservationRepository.save(reservation);
 	}
 }

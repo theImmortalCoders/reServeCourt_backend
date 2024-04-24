@@ -53,6 +53,7 @@ public class ReservationService {
 					court.getReservations().add(r);
 					courtUtil.save(court);
 				})
+				//todo send mail to owner and booker
 				.map(reservationMapper::map)
 				.get();
 	}
@@ -74,6 +75,7 @@ public class ReservationService {
 				})
 				.peek(r -> validate(r, true))
 				.peek(reservationUtil::save)
+				//todo send mail to owner and booker
 				.map(reservationMapper::map)
 				.get();
 	}
@@ -84,6 +86,9 @@ public class ReservationService {
 		Court court = reservation.getCourt();
 		Club club = court.getClub();
 
+		if (court.isClosed()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Court is closed");
+		}
 		if (reservation.getTimeFrom().minusDays(7).isBefore(LocalDateTime.now())) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot book later than 7 days before");
 		}

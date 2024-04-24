@@ -15,6 +15,7 @@ import pl.chopy.reserve_court_backend.infrastructure.club.dto.ClubMapperImpl;
 import pl.chopy.reserve_court_backend.infrastructure.club.dto.ClubSingleRequest;
 import pl.chopy.reserve_court_backend.infrastructure.club.dto.response.ClubSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.image.ImageUtil;
+import pl.chopy.reserve_court_backend.infrastructure.reservation.ReservationUtil;
 import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
 import pl.chopy.reserve_court_backend.model.DaysOpen;
 import pl.chopy.reserve_court_backend.model.entity.*;
@@ -40,6 +41,8 @@ public class ClubServiceTest {
 	private ClubUtil clubUtil = new ClubUtil(clubRepository);
 	@Mock
 	private ImageUtil imageUtil;
+	@Mock
+	private ReservationUtil reservationUtil;
 	@Spy
 	private final ClubMapper clubMapper = new ClubMapperImpl();
 	@Mock
@@ -99,8 +102,11 @@ public class ClubServiceTest {
 	public void shouldThrowBadRequestWhenDeleteClub() {
 		var court = new Court();
 		var reservation = new Reservation();
+
 		court.setReservations(new ArrayList<>(List.of(reservation)));
 		club.getCourts().add(court);
+
+		when(reservationUtil.getAllActiveByCourt(court)).thenReturn(new ArrayList<>(List.of(reservation)));
 
 		assertThrows(
 				ResponseStatusException.class,

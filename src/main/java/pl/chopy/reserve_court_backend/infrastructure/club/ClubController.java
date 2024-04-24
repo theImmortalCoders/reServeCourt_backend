@@ -49,6 +49,7 @@ public class ClubController {
 	@ApiResponse(responseCode = "200")
 	@ApiResponse(responseCode = "401")
 	@ApiResponse(responseCode = "403")
+	@ApiResponse(responseCode = "400", description = "Club has active reservations")
 	@ApiResponse(responseCode = "404")
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public void delete(@PathVariable Long clubId) {

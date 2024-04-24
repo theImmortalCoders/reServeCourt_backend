@@ -14,6 +14,7 @@ import pl.chopy.reserve_court_backend.infrastructure.club.dto.response.ClubShort
 import pl.chopy.reserve_court_backend.infrastructure.club.dto.response.ClubSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.court.dto.response.CourtShortResponse;
 import pl.chopy.reserve_court_backend.infrastructure.image.ImageUtil;
+import pl.chopy.reserve_court_backend.infrastructure.reservation.ReservationUtil;
 import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
 import pl.chopy.reserve_court_backend.model.DaysOpen;
 import pl.chopy.reserve_court_backend.model.entity.Club;
@@ -30,6 +31,7 @@ public class ClubService {
 	private final ImageUtil imageUtil;
 	private final ClubRepository clubRepository;
 	private final UserUtil userUtil;
+	private final ReservationUtil reservationUtil;
 
 	void add(ClubSingleRequest request) {
 		Option.of(request)
@@ -67,12 +69,7 @@ public class ClubService {
 
 		if (!club.getCourts()
 				.stream()
-				.filter(c -> !
-						c.getReservations()
-								.stream()
-								.filter(r -> !r.isCanceled())
-								.toList()
-								.isEmpty())
+				.filter(c -> !reservationUtil.getAllActiveByCourt(c).isEmpty())
 				.toList()
 				.isEmpty()
 		) {

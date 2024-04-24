@@ -38,4 +38,6 @@ public class ReservationController {
 	public ResponseEntity<ReservationSingleResponse> update(@RequestBody ReservationSingleRequest request, @PathVariable Long reservationId) {
 		return ResponseEntity.ok(reservationService.update(request, reservationId));
 	}
+
+
 }
