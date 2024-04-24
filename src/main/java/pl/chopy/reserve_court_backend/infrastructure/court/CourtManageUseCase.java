@@ -10,9 +10,10 @@ import pl.chopy.reserve_court_backend.infrastructure.court.dto.CourtMapper;
 import pl.chopy.reserve_court_backend.infrastructure.court.dto.CourtSingleRequest;
 import pl.chopy.reserve_court_backend.infrastructure.court.dto.response.CourtSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.image.ImageUtil;
+import pl.chopy.reserve_court_backend.infrastructure.reservation.ReservationUtil;
+import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
 import pl.chopy.reserve_court_backend.model.entity.Club;
 import pl.chopy.reserve_court_backend.model.entity.Court;
-import pl.chopy.reserve_court_backend.model.entity.Reservation;
 import pl.chopy.reserve_court_backend.model.entity.repository.CourtRepository;
 
 @Component
@@ -23,6 +24,8 @@ public class CourtManageUseCase {
 	private final CourtMapper courtMapper;
 	private final CourtRepository courtRepository;
 	private final ImageUtil imageUtil;
+	private final ReservationUtil reservationUtil;
+	private final UserUtil userUtil;
 
 	public void add(Long clubId, CourtSingleRequest request) {
 		Club club = clubUtil.getById(clubId);
@@ -69,7 +72,10 @@ public class CourtManageUseCase {
 		court.setClosed(closed);
 		courtUtil.save(court);
 
-		//todo cancel all reservations
+		if (closed) {
+			reservationUtil.getAllActiveByCourt(court)
+					.forEach(r -> reservationUtil.cancel(r.getId(), userUtil.getCurrentUser()));
+		}
 	}
 
 	//
@@ -77,7 +83,7 @@ public class CourtManageUseCase {
 	private boolean hasActiveReservations(Court court) {
 		return !Option.of(court)
 				.filter(c -> !c.getReservations().stream()
-						.filter(Reservation::isActive)
+						.filter(r -> !r.isCanceled())
 						.toList()
 						.isEmpty())
 				.toList()

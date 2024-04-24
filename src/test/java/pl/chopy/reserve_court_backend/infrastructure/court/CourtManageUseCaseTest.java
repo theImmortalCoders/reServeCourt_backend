@@ -16,6 +16,7 @@ import pl.chopy.reserve_court_backend.infrastructure.court.dto.CourtMapperImpl;
 import pl.chopy.reserve_court_backend.infrastructure.court.dto.CourtSingleRequest;
 import pl.chopy.reserve_court_backend.infrastructure.court.dto.response.CourtSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.image.ImageUtil;
+import pl.chopy.reserve_court_backend.infrastructure.reservation.ReservationUtil;
 import pl.chopy.reserve_court_backend.model.entity.Club;
 import pl.chopy.reserve_court_backend.model.entity.Court;
 import pl.chopy.reserve_court_backend.model.entity.Image;
@@ -41,6 +42,8 @@ public class CourtManageUseCaseTest {
 	private CourtUtil courtUtil = new CourtUtil(courtRepository);
 	@Mock
 	private ClubUtil clubUtil;
+	@Mock
+	private ReservationUtil reservationUtil;
 	@Spy
 	private final CourtMapper courtMapper = new CourtMapperImpl();
 	@Mock

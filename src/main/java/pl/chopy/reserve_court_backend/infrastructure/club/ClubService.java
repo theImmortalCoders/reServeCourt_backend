@@ -14,10 +14,10 @@ import pl.chopy.reserve_court_backend.infrastructure.club.dto.response.ClubShort
 import pl.chopy.reserve_court_backend.infrastructure.club.dto.response.ClubSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.court.dto.response.CourtShortResponse;
 import pl.chopy.reserve_court_backend.infrastructure.image.ImageUtil;
+import pl.chopy.reserve_court_backend.infrastructure.reservation.ReservationUtil;
 import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
 import pl.chopy.reserve_court_backend.model.DaysOpen;
 import pl.chopy.reserve_court_backend.model.entity.Club;
-import pl.chopy.reserve_court_backend.model.entity.Reservation;
 import pl.chopy.reserve_court_backend.model.entity.User;
 import pl.chopy.reserve_court_backend.model.entity.repository.ClubRepository;
 
@@ -31,6 +31,7 @@ public class ClubService {
 	private final ImageUtil imageUtil;
 	private final ClubRepository clubRepository;
 	private final UserUtil userUtil;
+	private final ReservationUtil reservationUtil;
 
 	void add(ClubSingleRequest request) {
 		Option.of(request)
@@ -68,12 +69,7 @@ public class ClubService {
 
 		if (!club.getCourts()
 				.stream()
-				.filter(c -> !
-						c.getReservations()
-								.stream()
-								.filter(Reservation::isActive)
-								.toList()
-								.isEmpty())
+				.filter(c -> !reservationUtil.getAllActiveByCourt(c).isEmpty())
 				.toList()
 				.isEmpty()
 		) {
@@ -117,7 +113,7 @@ public class ClubService {
 	//
 
 	private static void checkOpenDaysValid(DaysOpen daysOpen) {
-		if (!daysOpen.checkValid()) {
+		if (!daysOpen.checkIsValid()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Open days is invalid");
 		}
 	}

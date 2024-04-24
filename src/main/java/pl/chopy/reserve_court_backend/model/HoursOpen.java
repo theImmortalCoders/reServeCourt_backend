@@ -9,7 +9,11 @@ public class HoursOpen {
 	private LocalTime open = LocalTime.of(9, 0);
 	private LocalTime closed = LocalTime.of(18, 0);
 
-	public boolean checkValid() {
+	boolean checkIsValid() {
 		return (open == null && closed == null) || closed.isAfter(open);
+	}
+
+	boolean checkIsIntervalBetween(LocalTime from, LocalTime to) {
+		return from.isAfter(open) && to.isBefore(closed);
 	}
 }

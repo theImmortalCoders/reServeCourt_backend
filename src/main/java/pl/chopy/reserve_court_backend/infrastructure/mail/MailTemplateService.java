@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 
+import java.time.LocalDateTime;
+
 @Service
 @AllArgsConstructor
 public class MailTemplateService {
@@ -21,5 +23,17 @@ public class MailTemplateService {
 		message.setVariable("email", email);
 		message.setVariable("token", token);
 		emailSendingUtil.sendEmailWithHtmlTemplate(email, "Resetowanie hasła w ReServeCourt", "password_reset", message);
+	}
+
+	public void sendReservationInfoEmail(String email, String receiverName, String clubName, String courtName, LocalDateTime from, LocalDateTime to, String text) {
+		var message = new Context();
+		message.setVariable("email", email);
+		message.setVariable("receiverName", receiverName);
+		message.setVariable("clubName", clubName);
+		message.setVariable("courtName", courtName);
+		message.setVariable("from", from);
+		message.setVariable("to", to);
+		message.setVariable("text", text);
+		emailSendingUtil.sendEmailWithHtmlTemplate(email, "Informacje o rezerwacji", "reservation", message);
 	}
 }
