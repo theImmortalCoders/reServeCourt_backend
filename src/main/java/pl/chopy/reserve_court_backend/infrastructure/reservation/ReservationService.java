@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import pl.chopy.reserve_court_backend.infrastructure.club.ClubUtil;
 import pl.chopy.reserve_court_backend.infrastructure.court.CourtUtil;
 import pl.chopy.reserve_court_backend.infrastructure.mail.MailTemplateService;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.dto.ReservationMapper;
@@ -31,7 +30,6 @@ public class ReservationService {
 	private final ReservationRepository reservationRepository;
 	private final UserUtil userUtil;
 	private final CourtUtil courtUtil;
-	private final ClubUtil clubUtil;
 	private final MailTemplateService mailTemplateService;
 
 	public ReservationSingleResponse reserve(ReservationSingleRequest request, Long courtId) {
@@ -54,7 +52,15 @@ public class ReservationService {
 					court.getReservations().add(r);
 					courtUtil.save(court);
 				})
-				//todo send mail to owner and booker
+				.peek(r -> mailTemplateService.sendReservationInfoEmail(
+						booker.getEmail(),
+						booker.getName(),
+						court.getClub().getName(),
+						court.getName(),
+						r.getTimeFrom(),
+						r.getTimeTo(),
+						"Potwierdzenie rezerwacji: zarezerwowano poprawnie!"
+				))
 				.map(reservationMapper::map)
 				.get();
 	}
@@ -76,7 +82,15 @@ public class ReservationService {
 				})
 				.peek(r -> validate(r, true))
 				.peek(reservationUtil::save)
-				//todo send mail to owner and booker
+				.peek(r -> mailTemplateService.sendReservationInfoEmail(
+						booker.getEmail(),
+						booker.getName(),
+						r.getCourt().getClub().getName(),
+						r.getCourt().getName(),
+						r.getTimeFrom(),
+						r.getTimeTo(),
+						"Potwierdzenie rezerwacji: rezerwacja została poprawnie zaktualizowana!"
+				))
 				.map(reservationMapper::map)
 				.get();
 	}
@@ -90,14 +104,33 @@ public class ReservationService {
 		reservation.setCanceled(true);
 		reservationUtil.save(reservation);
 
-		//todo send mail to owner and booker
+		mailTemplateService.sendReservationInfoEmail(
+				booker.getEmail(),
+				booker.getName(),
+				reservation.getCourt().getClub().getName(),
+				reservation.getCourt().getName(),
+				reservation.getTimeFrom(),
+				reservation.getTimeTo(),
+				"Rezerwacja została anulowana."
+		);
 	}
 
 	public void confirm(Long reservationId) {
 		Reservation reservation = reservationUtil.getActiveById(reservationId);
+		User booker = reservation.getBooker();
 
 		reservation.setConfirmed(true);
 		reservationUtil.save(reservation);
+
+		mailTemplateService.sendReservationInfoEmail(
+				booker.getEmail(),
+				booker.getName(),
+				reservation.getCourt().getClub().getName(),
+				reservation.getCourt().getName(),
+				reservation.getTimeFrom(),
+				reservation.getTimeTo(),
+				"Twoja rezerwacja została potwierdzona przez administratora kortu!"
+		);
 	}
 
 	public List<ReservationShortResponse> getByCourtWithFilters(Long courtId, LocalDateTime from, LocalDateTime to) {

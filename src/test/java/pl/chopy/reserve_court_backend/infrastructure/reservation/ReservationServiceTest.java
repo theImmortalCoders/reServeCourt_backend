@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.web.server.ResponseStatusException;
-import pl.chopy.reserve_court_backend.infrastructure.club.ClubUtil;
 import pl.chopy.reserve_court_backend.infrastructure.court.CourtUtil;
 import pl.chopy.reserve_court_backend.infrastructure.mail.MailTemplateService;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.dto.ReservationMapper;
@@ -45,8 +44,6 @@ public class ReservationServiceTest {
 	private UserUtil userUtil;
 	@Mock
 	private CourtUtil courtUtil;
-	@Mock
-	private ClubUtil clubUtil;
 	@Mock
 	private MailTemplateService mailTemplateService;
 	private final ReservationRepository reservationRepository = mock(ReservationRepository.class);

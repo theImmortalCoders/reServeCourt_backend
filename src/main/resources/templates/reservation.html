@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Informacje o rezerwacji</title>
+</head>
+<body>
+<p>Cześć <span th:text="${receiverName}"></span>,</p>
+<p>Mamy nowe informacje na temat Twojej rezerwacji kortu <span th:text="${courtName}"></span> w klubie <span
+        th:text="${clubName}"></span>.</p>
+<p>Wiadomość:</p>
+<b th:text="${text}"></b>
+<p>Informacje o rezerwacji:</p>
+<ul>
+    <li>Nazwa kortu: <span th:text="${courtName}"></span></li>
+    <li>Data i godzina rozpoczęcia: <span th:text="${from}"></span></li>
+    <li>Data i godzina zakończenia: <span th:text="${to}"></span></li>
+</ul>
+<p>Pozdrawiamy, zespół ReServeCourt.</p>
+</body>
+</html>
