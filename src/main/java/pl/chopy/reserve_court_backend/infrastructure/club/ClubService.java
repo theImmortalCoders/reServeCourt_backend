@@ -52,14 +52,15 @@ public class ClubService {
 
 		Option.of(club)
 				.peek(c -> {
-					c.setName(request.getName());
-					c.setDescription(request.getDescription());
-					c.setLocation(request.getLocation());
 					if (c.getDaysOpen() == null) {
 						c.setDaysOpen(new DaysOpen());
 					}
 					checkOpenDaysValid(c.getDaysOpen());
 					updateLogo(request, c);
+					c.setName(request.getName());
+					c.setDescription(request.getDescription());
+					c.setLocation(request.getLocation());
+					c.setDaysOpen(request.getDaysOpen());
 				})
 				.peek(clubUtil::save);
 	}
