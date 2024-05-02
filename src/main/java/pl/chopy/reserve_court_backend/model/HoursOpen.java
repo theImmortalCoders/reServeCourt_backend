@@ -10,7 +10,10 @@ public class HoursOpen {
 	private LocalTime closed = LocalTime.of(18, 0);
 
 	boolean checkIsValid() {
-		return (open == null && closed == null) || closed.isAfter(open);
+		if ((open == null && closed != null) || open != null && closed == null) {
+			return false;
+		}
+		return (open == null) || closed.isAfter(open);
 	}
 
 	boolean checkIsIntervalBetween(LocalTime from, LocalTime to) {
