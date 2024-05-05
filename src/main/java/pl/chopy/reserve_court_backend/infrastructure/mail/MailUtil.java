@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import pl.chopy.reserve_court_backend.infrastructure.mail.dto.MailSingleRequest;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +34,16 @@ public class MailUtil {
 				"Resetowanie hasła w ReServeCourt",
 				"password_reset",
 				new HashMap<>())
+		);
+	}
+
+	public void sendReservationInfoEmail(String email, String name, String clubName, String courtName, LocalDateTime from, LocalDateTime to, String message) {
+
+		rabbitTemplate.convertAndSend("mailingQueue", new MailSingleRequest(
+				email,
+				"Witaj w ReServeCourt, " + name + "!",
+				"reservation",
+				new HashMap<>(Map.of("name", name, "clubName", clubName, "courtName", courtName, "from", from, "to", to, "message", message)))
 		);
 	}
 }
