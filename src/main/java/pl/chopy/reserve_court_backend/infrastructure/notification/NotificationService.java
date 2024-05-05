@@ -23,8 +23,7 @@ public class NotificationService {
 		Option.of(request)
 				.map(notificationMapper::map)
 				.peek(this::save);
-
-		//websocketController.broadcastMessage();
+		//todo send to socket
 	}
 
 	//

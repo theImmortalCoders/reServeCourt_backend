@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.infrastructure.court.CourtUtil;
 import pl.chopy.reserve_court_backend.infrastructure.mail.MailUtil;
+import pl.chopy.reserve_court_backend.infrastructure.notification.NotificationUtil;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.dto.ReservationMapper;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.dto.ReservationSingleRequest;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.dto.response.ReservationShortResponse;
@@ -31,6 +32,7 @@ public class ReservationService {
 	private final UserUtil userUtil;
 	private final CourtUtil courtUtil;
 	private final MailUtil mailUtil;
+	private final NotificationUtil notificationUtil;
 
 	public ReservationSingleResponse reserve(ReservationSingleRequest request, Long courtId) {
 		User booker = userUtil.getCurrentUser();
@@ -61,6 +63,7 @@ public class ReservationService {
 						r.getTimeTo(),
 						"Potwierdzenie rezerwacji: zarezerwowano poprawnie!"
 				))
+				.peek(r -> notificationUtil.sendManagementNotification(booker.getId(), "Zarezerwowano"))
 				.map(reservationMapper::map)
 				.get();
 	}
