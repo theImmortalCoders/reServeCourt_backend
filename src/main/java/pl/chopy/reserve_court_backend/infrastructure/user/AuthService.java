@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.infrastructure.mail.MailUtil;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapper;
@@ -46,6 +47,10 @@ public class AuthService {
 	void authenticate(@NotNull UserSingleLoginRequest userRequest, HttpServletRequest request, HttpServletResponse response) {
 		User user = Option.ofOptional(getOptionalByEmail(userRequest.getEmail()))
 				.filter(u -> passwordEncoder.matches(userRequest.getPassword(), u.getHashedPassword()))
+				.peek(u -> {
+					u.setSessionId(RequestContextHolder.currentRequestAttributes().getSessionId());
+					userUtil.saveUser(u);
+				})
 				.getOrElseThrow(() ->
 						new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials for user '" + userRequest.getEmail() + "'.")
 				);

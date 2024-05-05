@@ -28,6 +28,7 @@ public class User implements UserDetails {
 	private String surname;
 	private LocalDate birthDate;
 	private String phoneNumber;
+	private String sessionId;
 
 	public enum UserRole {
 		USER, ADMIN
