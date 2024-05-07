@@ -3,14 +3,17 @@ package pl.chopy.reserve_court_backend.infrastructure.notification;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.session.web.socket.events.SessionConnectEvent;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationMapper;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSingleRequest;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSingleResponse;
@@ -20,7 +23,9 @@ import pl.chopy.reserve_court_backend.model.entity.repository.NotificationReposi
 import pl.chopy.reserve_court_backend.util.RmeSessionChannelInterceptor;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @RestController
@@ -34,7 +39,7 @@ public class WebsocketController {
 	@PostMapping("/api/socket/send")
 	public void send(@RequestBody NotificationSingleRequest notification) throws JsonProcessingException {
 		User user = userUtil.getUserById(notification.getReceiverId());
-		String sessionId = RmeSessionChannelInterceptor.sessionId;
+		String sessionId = user.getSessionId();
 		SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
 		headerAccessor.setSessionId(sessionId);
 		headerAccessor.setLeaveMutable(true);
@@ -51,6 +56,8 @@ public class WebsocketController {
 			return;
 		}
 		User user = userUtil.getUserByEmail(principal.getName());
+		user.setSessionId(sessionId);
+		userUtil.saveUser(user);
 		sendNotifications(user, sessionId);
 	}
 
