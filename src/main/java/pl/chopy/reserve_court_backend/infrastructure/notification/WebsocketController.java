@@ -33,18 +33,17 @@ public class WebsocketController {
 	private final NotificationMapper notificationMapper;
 	private final SimpMessagingTemplate simpMessagingTemplate;
 	private final ObjectMapper objectMapper;
-	private final NotificationUtil notificationUtil;
 
 	@PostMapping("/api/socket/send")
 	public void send(@RequestBody NotificationSocketRequest request) throws JsonProcessingException {
 		User user = userUtil.getUserById(request.getReceiverId());
 		String sessionId = user.getSessionId();
-
 		SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
 		headerAccessor.setSessionId(sessionId);
 		headerAccessor.setLeaveMutable(true);
 
-		Notification notification = notificationUtil.getById(request.getNotificationId());
+		Notification notification = notificationRepository.findById(request.getNotificationId())
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Notification not found"));
 
 		simpMessagingTemplate.convertAndSendToUser(
 				sessionId,
@@ -63,8 +62,6 @@ public class WebsocketController {
 		userUtil.saveUser(user);
 		sendNotifications(user, sessionId);
 	}
-
-	//
 
 	private void sendNotifications(User user, String sessionId) throws JsonProcessingException {
 		List<NotificationSingleResponse> notifications = notificationRepository

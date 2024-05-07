@@ -8,6 +8,7 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import pl.chopy.reserve_court_backend.util.RmeSessionChannelInterceptor;
 
 
 @Configuration
@@ -21,6 +22,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 		config.enableSimpleBroker("/topic", "/queue");
 		config.setApplicationDestinationPrefixes("/app");
 		config.setUserDestinationPrefix("/user");
+	}
+
+	@Bean
+	public RmeSessionChannelInterceptor rmeSessionChannelInterceptor() {
+		return new RmeSessionChannelInterceptor();
+	}
+
+	@Override
+	public void configureClientInboundChannel(ChannelRegistration registration) {
+		registration.interceptors(rmeSessionChannelInterceptor());
 	}
 
 	@Override
