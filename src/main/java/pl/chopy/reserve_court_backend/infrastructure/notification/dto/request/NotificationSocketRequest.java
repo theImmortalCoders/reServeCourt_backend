@@ -1,4 +1,4 @@
-package pl.chopy.reserve_court_backend.infrastructure.notification.dto;
+package pl.chopy.reserve_court_backend.infrastructure.notification.dto.request;
 
 import lombok.Data;
 

@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.config.ApplicationProps;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationMapper;
-import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSingleRequest;
-import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSocketRequest;
+import pl.chopy.reserve_court_backend.infrastructure.notification.dto.request.NotificationSingleRequest;
+import pl.chopy.reserve_court_backend.infrastructure.notification.dto.request.NotificationSocketRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
 import pl.chopy.reserve_court_backend.model.entity.Notification;
 import pl.chopy.reserve_court_backend.model.entity.User;
@@ -29,41 +29,32 @@ public class NotificationService {
 	private final ObjectMapper objectMapper;
 	private final ApplicationProps applicationProps;
 	private final UserUtil userUtil;
+	private final NotificationUtil notificationUtil;
 
 	@RabbitListener(queues = "managementQueue")
-	public void listen(NotificationSingleRequest request) throws IOException {
+	public void saveAndDisplayNotification(NotificationSingleRequest request) throws IOException {
 		Notification notification = Option.of(request)
 				.map(notificationMapper::map)
-				.map(this::save)
+				.map(notificationUtil::save)
 				.get();
 
-		send(notification);
+		sendToSocketActiveSession(notification);
 	}
 
 	public void markAsRead(Long notificationId) {
-		Notification notification = notificationRepository.findById(notificationId)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Notification not found"));
-
+		Notification notification = notificationUtil.getById(notificationId);
 		User user = userUtil.getCurrentUser();
 
 		if (!notification.getReceiver().getId().equals(user.getId())) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot mark this notification");
 		}
 
-		notification.setRead(true);
-		notificationRepository.save(notification);
+		notificationRepository.delete(notification);
 	}
 
 	//
 
-	private Notification save(Notification notification) {
-		return Option.of(notificationRepository.save(notification))
-				.getOrElseThrow(
-						() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, notification.toString())
-				);
-	}
-
-	private void send(Notification notification) throws IOException {
+	private void sendToSocketActiveSession(Notification notification) throws IOException {
 		URL url = new URL(applicationProps.getBackendDomain() + "/api/socket/send");
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
@@ -71,15 +62,16 @@ public class NotificationService {
 		con.setRequestProperty("Content-Type", "application/json");
 		con.setDoOutput(true);
 
-		NotificationSocketRequest request = new NotificationSocketRequest();
+		var request = new NotificationSocketRequest();
 		request.setNotificationId(notification.getId());
 		request.setReceiverId(notification.getReceiver().getId());
 		String notificationRequestJSON = objectMapper.writeValueAsString(request);
+
 		try (OutputStream os = con.getOutputStream()) {
 			byte[] input = notificationRequestJSON.getBytes("utf-8");
 			os.write(input, 0, input.length);
 		}
-		int responseCode = con.getResponseCode();
-		System.out.println("Response Code: " + responseCode);
+
+		con.getResponseCode();
 	}
 }

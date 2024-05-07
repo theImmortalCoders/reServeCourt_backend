@@ -3,7 +3,7 @@ package pl.chopy.reserve_court_backend.infrastructure.notification;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -12,11 +12,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationMapper;
-import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSingleRequest;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSingleResponse;
-import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSocketRequest;
+import pl.chopy.reserve_court_backend.infrastructure.notification.dto.request.NotificationSocketRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
 import pl.chopy.reserve_court_backend.model.entity.Notification;
 import pl.chopy.reserve_court_backend.model.entity.User;
@@ -33,23 +31,15 @@ public class WebsocketController {
 	private final NotificationMapper notificationMapper;
 	private final SimpMessagingTemplate simpMessagingTemplate;
 	private final ObjectMapper objectMapper;
+	private final NotificationUtil notificationUtil;
 
 	@PostMapping("/api/socket/send")
 	public void send(@RequestBody NotificationSocketRequest request) throws JsonProcessingException {
 		User user = userUtil.getUserById(request.getReceiverId());
+		Notification notification = notificationUtil.getById(request.getNotificationId());
 		String sessionId = user.getSessionId();
-		SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
-		headerAccessor.setSessionId(sessionId);
-		headerAccessor.setLeaveMutable(true);
 
-		Notification notification = notificationRepository.findById(request.getNotificationId())
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Notification not found"));
-
-		simpMessagingTemplate.convertAndSendToUser(
-				sessionId,
-				"/queue/reply",
-				objectMapper.writeValueAsString(List.of(notificationMapper.map(notification))),
-				headerAccessor.getMessageHeaders());
+		sendNotifications(sessionId, notification);
 	}
 
 	@MessageMapping("/broadcast")
@@ -57,22 +47,31 @@ public class WebsocketController {
 		if (principal == null) {
 			return;
 		}
+
 		User user = userUtil.getUserByEmail(principal.getName());
 		user.setSessionId(sessionId);
 		userUtil.saveUser(user);
-		sendNotifications(user, sessionId);
+
+		List<NotificationSingleResponse> notifications = getNotificationsByUser(user);
+
+		sendNotifications(sessionId, notifications);
 	}
 
-	private void sendNotifications(User user, String sessionId) throws JsonProcessingException {
-		List<NotificationSingleResponse> notifications = notificationRepository
-				.findAllByReceiverIdAndRead(user.getId(), false)
+	//
+
+	private List<NotificationSingleResponse> getNotificationsByUser(User user) {
+		return notificationRepository
+				.findAllByReceiverId(user.getId())
 				.stream()
 				.map(notificationMapper::map)
 				.toList();
+	}
 
+	private void sendNotifications(String sessionId, Object notifications) throws JsonProcessingException {
 		SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
 		headerAccessor.setSessionId(sessionId);
 		headerAccessor.setLeaveMutable(true);
+
 		simpMessagingTemplate.convertAndSendToUser(
 				sessionId,
 				"/queue/reply",

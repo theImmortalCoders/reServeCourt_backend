@@ -23,16 +23,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 		config.setUserDestinationPrefix("/user");
 	}
 
-//	@Bean
-//	public RmeSessionChannelInterceptor rmeSessionChannelInterceptor() {
-//		return new RmeSessionChannelInterceptor();
-//	}
-//
-//	@Override
-//	public void configureClientInboundChannel(ChannelRegistration registration) {
-//		registration.interceptors(rmeSessionChannelInterceptor());
-//	}
-
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/ws-endpoint").setAllowedOrigins(applicationProps.getSocketDomain()).withSockJS();

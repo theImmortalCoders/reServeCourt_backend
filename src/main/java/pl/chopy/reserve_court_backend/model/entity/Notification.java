@@ -13,5 +13,4 @@ public class Notification {
 	@ManyToOne
 	@JoinColumn(name = "receiver_id")
 	private User receiver;
-	private boolean read = false;
 }
