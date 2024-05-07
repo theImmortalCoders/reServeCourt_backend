@@ -29,20 +29,20 @@ public class NotificationService {
 	private final ObjectMapper objectMapper;
 	private final ApplicationProps applicationProps;
 	private final UserUtil userUtil;
+	private final NotificationUtil notificationUtil;
 
 	@RabbitListener(queues = "managementQueue")
 	public void listen(NotificationSingleRequest request) throws IOException {
 		Notification notification = Option.of(request)
 				.map(notificationMapper::map)
-				.map(this::save)
+				.map(notificationUtil::save)
 				.get();
 
 		send(notification);
 	}
 
 	public void markAsRead(Long notificationId) {
-		Notification notification = notificationRepository.findById(notificationId)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Notification not found"));
+		Notification notification = notificationUtil.getById(notificationId);
 
 		User user = userUtil.getCurrentUser();
 
@@ -56,13 +56,6 @@ public class NotificationService {
 
 	//
 
-	private Notification save(Notification notification) {
-		return Option.of(notificationRepository.save(notification))
-				.getOrElseThrow(
-						() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, notification.toString())
-				);
-	}
-
 	private void send(Notification notification) throws IOException {
 		URL url = new URL(applicationProps.getBackendDomain() + "/api/socket/send");
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -74,6 +67,7 @@ public class NotificationService {
 		NotificationSocketRequest request = new NotificationSocketRequest();
 		request.setNotificationId(notification.getId());
 		request.setReceiverId(notification.getReceiver().getId());
+
 		String notificationRequestJSON = objectMapper.writeValueAsString(request);
 		try (OutputStream os = con.getOutputStream()) {
 			byte[] input = notificationRequestJSON.getBytes("utf-8");
