@@ -3,6 +3,7 @@ package pl.chopy.reserve_court_backend.infrastructure.notification;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -11,10 +12,13 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationMapper;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSingleRequest;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSingleResponse;
+import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSocketRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
+import pl.chopy.reserve_court_backend.model.entity.Notification;
 import pl.chopy.reserve_court_backend.model.entity.User;
 import pl.chopy.reserve_court_backend.model.entity.repository.NotificationRepository;
 
@@ -31,16 +35,20 @@ public class WebsocketController {
 	private final ObjectMapper objectMapper;
 
 	@PostMapping("/api/socket/send")
-	public void send(@RequestBody NotificationSingleRequest notification) throws JsonProcessingException {
-		User user = userUtil.getUserById(notification.getReceiverId());
+	public void send(@RequestBody NotificationSocketRequest request) throws JsonProcessingException {
+		User user = userUtil.getUserById(request.getReceiverId());
 		String sessionId = user.getSessionId();
 		SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
 		headerAccessor.setSessionId(sessionId);
 		headerAccessor.setLeaveMutable(true);
+
+		Notification notification = notificationRepository.findById(request.getNotificationId())
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Notification not found"));
+
 		simpMessagingTemplate.convertAndSendToUser(
 				sessionId,
 				"/queue/reply",
-				objectMapper.writeValueAsString(List.of(notificationMapper.map(notificationMapper.map(notification)))),
+				objectMapper.writeValueAsString(List.of(notificationMapper.map(notification))),
 				headerAccessor.getMessageHeaders());
 	}
 

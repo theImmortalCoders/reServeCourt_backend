@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.config.ApplicationProps;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationMapper;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSingleRequest;
+import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSocketRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
 import pl.chopy.reserve_court_backend.model.entity.Notification;
 import pl.chopy.reserve_court_backend.model.entity.User;
@@ -70,11 +71,12 @@ public class NotificationService {
 		con.setRequestProperty("Content-Type", "application/json");
 		con.setDoOutput(true);
 
-		var request = new NotificationSingleRequest(notification.getReceiver().getId(), notification.getMessage());
-
-		String jsonNotification = objectMapper.writeValueAsString(request);
+		NotificationSocketRequest request = new NotificationSocketRequest();
+		request.setNotificationId(notification.getId());
+		request.setReceiverId(notification.getReceiver().getId());
+		String notificationRequestJSON = objectMapper.writeValueAsString(request);
 		try (OutputStream os = con.getOutputStream()) {
-			byte[] input = jsonNotification.getBytes("utf-8");
+			byte[] input = notificationRequestJSON.getBytes("utf-8");
 			os.write(input, 0, input.length);
 		}
 		int responseCode = con.getResponseCode();
