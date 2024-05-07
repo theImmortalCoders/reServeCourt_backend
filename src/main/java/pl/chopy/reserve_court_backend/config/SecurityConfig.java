@@ -66,6 +66,11 @@ public class SecurityConfig {
 								applicationProps.getAllowedOrigins().toArray(new String[0]))
 						.allowCredentials(true)
 						.allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE");
+
+				registry
+						.addMapping("/api/socket/send")
+						.allowCredentials(true)
+						.allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE");
 			}
 		};
 	}

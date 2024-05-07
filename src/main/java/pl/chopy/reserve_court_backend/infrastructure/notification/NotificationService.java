@@ -10,7 +10,9 @@ import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.config.ApplicationProps;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationMapper;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSingleRequest;
+import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
 import pl.chopy.reserve_court_backend.model.entity.Notification;
+import pl.chopy.reserve_court_backend.model.entity.User;
 import pl.chopy.reserve_court_backend.model.entity.repository.NotificationRepository;
 
 import java.io.IOException;
@@ -25,6 +27,7 @@ public class NotificationService {
 	private final NotificationRepository notificationRepository;
 	private final ObjectMapper objectMapper;
 	private final ApplicationProps applicationProps;
+	private final UserUtil userUtil;
 
 	@RabbitListener(queues = "managementQueue")
 	public void listen(NotificationSingleRequest request) throws IOException {
@@ -34,6 +37,20 @@ public class NotificationService {
 				.get();
 
 		send(notification);
+	}
+
+	public void markAsRead(Long notificationId) {
+		Notification notification = notificationRepository.findById(notificationId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Notification not found"));
+
+		User user = userUtil.getCurrentUser();
+
+		if (!notification.getReceiver().getId().equals(user.getId())) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot mark this notification");
+		}
+
+		notification.setRead(true);
+		notificationRepository.save(notification);
 	}
 
 	//
