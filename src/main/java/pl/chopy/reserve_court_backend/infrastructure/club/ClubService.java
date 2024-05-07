@@ -14,6 +14,7 @@ import pl.chopy.reserve_court_backend.infrastructure.club.dto.response.ClubShort
 import pl.chopy.reserve_court_backend.infrastructure.club.dto.response.ClubSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.court.dto.response.CourtShortResponse;
 import pl.chopy.reserve_court_backend.infrastructure.image.ImageUtil;
+import pl.chopy.reserve_court_backend.infrastructure.notification.NotificationUtil;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.ReservationUtil;
 import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
 import pl.chopy.reserve_court_backend.model.DaysOpen;
@@ -32,6 +33,7 @@ public class ClubService {
 	private final ClubRepository clubRepository;
 	private final UserUtil userUtil;
 	private final ReservationUtil reservationUtil;
+	private final NotificationUtil notificationUtil;
 
 	void add(ClubSingleRequest request) {
 		Option.of(request)
@@ -45,6 +47,8 @@ public class ClubService {
 					checkOpenDaysValid(c.getDaysOpen());
 				})
 				.peek(clubUtil::save);
+
+		notificationUtil.sendManagementNotification(userUtil.getCurrentUser().getId(), "Dodano klub");
 	}
 
 	void update(Long clubId, ClubSingleRequest request) {

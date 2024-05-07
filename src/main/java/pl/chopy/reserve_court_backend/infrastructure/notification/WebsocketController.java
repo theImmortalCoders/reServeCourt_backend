@@ -8,18 +8,16 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationMapper;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSingleRequest;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
-import pl.chopy.reserve_court_backend.model.entity.Notification;
 import pl.chopy.reserve_court_backend.model.entity.User;
 import pl.chopy.reserve_court_backend.model.entity.repository.NotificationRepository;
+import pl.chopy.reserve_court_backend.util.RmeSessionChannelInterceptor;
 
 import java.security.Principal;
 import java.util.List;
@@ -36,22 +34,15 @@ public class WebsocketController {
 	@PostMapping("/api/socket/send")
 	public void send(@RequestBody NotificationSingleRequest notification) throws JsonProcessingException {
 		User user = userUtil.getUserById(notification.getReceiverId());
-
-		List<NotificationSingleResponse> notifications = notificationRepository
-				.findAllByReceiverIdAndRead(user.getId(), false)
-				.stream()
-				.map(notificationMapper::map)
-				.toList();
-
+		String sessionId = RmeSessionChannelInterceptor.sessionId;
 		SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
-		headerAccessor.setSessionId(user.getSessionId());
+		headerAccessor.setSessionId(sessionId);
 		headerAccessor.setLeaveMutable(true);
-
-		simpMessagingTemplate.convertAndSend(
+		simpMessagingTemplate.convertAndSendToUser(
+				sessionId,
 				"/queue/reply",
-				objectMapper.writeValueAsString(notifications)
-		);
-
+				objectMapper.writeValueAsString(List.of(notificationMapper.map(notificationMapper.map(notification)))),
+				headerAccessor.getMessageHeaders());
 	}
 
 	@MessageMapping("/broadcast")
@@ -59,9 +50,11 @@ public class WebsocketController {
 		if (principal == null) {
 			return;
 		}
-
 		User user = userUtil.getUserByEmail(principal.getName());
+		sendNotifications(user, sessionId);
+	}
 
+	private void sendNotifications(User user, String sessionId) throws JsonProcessingException {
 		List<NotificationSingleResponse> notifications = notificationRepository
 				.findAllByReceiverIdAndRead(user.getId(), false)
 				.stream()
@@ -71,13 +64,11 @@ public class WebsocketController {
 		SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
 		headerAccessor.setSessionId(sessionId);
 		headerAccessor.setLeaveMutable(true);
-
 		simpMessagingTemplate.convertAndSendToUser(
 				sessionId,
 				"/queue/reply",
 				objectMapper.writeValueAsString(notifications),
 				headerAccessor.getMessageHeaders());
-
 	}
 }
 

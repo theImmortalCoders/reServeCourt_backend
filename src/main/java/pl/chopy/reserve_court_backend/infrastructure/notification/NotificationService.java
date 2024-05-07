@@ -7,6 +7,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import pl.chopy.reserve_court_backend.config.ApplicationProps;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationMapper;
 import pl.chopy.reserve_court_backend.infrastructure.notification.dto.NotificationSingleRequest;
 import pl.chopy.reserve_court_backend.model.entity.Notification;
@@ -15,7 +16,6 @@ import pl.chopy.reserve_court_backend.model.entity.repository.NotificationReposi
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 @Service
@@ -24,6 +24,7 @@ public class NotificationService {
 	private final NotificationMapper notificationMapper;
 	private final NotificationRepository notificationRepository;
 	private final ObjectMapper objectMapper;
+	private final ApplicationProps applicationProps;
 
 	@RabbitListener(queues = "managementQueue")
 	public void listen(NotificationSingleRequest request) throws IOException {
@@ -45,7 +46,7 @@ public class NotificationService {
 	}
 
 	private void send(Notification notification) throws IOException {
-		URL url = new URL("http://localhost:8080/api/socket/send");
+		URL url = new URL(applicationProps.getBackendDomain() + "/api/socket/send");
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
 		con.setRequestMethod("POST");

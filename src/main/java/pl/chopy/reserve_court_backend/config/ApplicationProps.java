@@ -15,5 +15,7 @@ import java.util.Set;
 public class ApplicationProps {
 	private List<String> allowedOrigins;
 	private String defaultRole;
+	private String backendDomain;
+	private String socketDomain;
 	private Map<String, Set<String>> privileges = new LinkedHashMap<>();
 }

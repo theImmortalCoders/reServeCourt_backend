@@ -15,6 +15,7 @@ import pl.chopy.reserve_court_backend.infrastructure.club.dto.ClubMapperImpl;
 import pl.chopy.reserve_court_backend.infrastructure.club.dto.ClubSingleRequest;
 import pl.chopy.reserve_court_backend.infrastructure.club.dto.response.ClubSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.image.ImageUtil;
+import pl.chopy.reserve_court_backend.infrastructure.notification.NotificationUtil;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.ReservationUtil;
 import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
 import pl.chopy.reserve_court_backend.model.DaysOpen;
@@ -43,6 +44,8 @@ public class ClubServiceTest {
 	private ImageUtil imageUtil;
 	@Mock
 	private ReservationUtil reservationUtil;
+	@Mock
+	private NotificationUtil notificationUtil;
 	@Spy
 	private final ClubMapper clubMapper = new ClubMapperImpl();
 	@Mock
