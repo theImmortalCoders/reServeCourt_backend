@@ -11,7 +11,8 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.infrastructure.court.CourtUtil;
-import pl.chopy.reserve_court_backend.infrastructure.mail.MailTemplateService;
+import pl.chopy.reserve_court_backend.infrastructure.mail.MailUtil;
+import pl.chopy.reserve_court_backend.infrastructure.notification.NotificationUtil;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.dto.ReservationMapper;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.dto.ReservationMapperImpl;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.dto.ReservationSingleRequest;
@@ -45,7 +46,9 @@ public class ReservationServiceTest {
 	@Mock
 	private CourtUtil courtUtil;
 	@Mock
-	private MailTemplateService mailTemplateService;
+	private MailUtil mailUtil;
+	@Mock
+	private NotificationUtil notificationUtil;
 	private final ReservationRepository reservationRepository = mock(ReservationRepository.class);
 	@Spy
 	private final ReservationMapper reservationMapper = new ReservationMapperImpl();

@@ -6,7 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.infrastructure.court.CourtUtil;
-import pl.chopy.reserve_court_backend.infrastructure.mail.MailTemplateService;
+import pl.chopy.reserve_court_backend.infrastructure.mail.MailUtil;
+import pl.chopy.reserve_court_backend.infrastructure.notification.NotificationUtil;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.dto.ReservationMapper;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.dto.ReservationSingleRequest;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.dto.response.ReservationShortResponse;
@@ -30,7 +31,8 @@ public class ReservationService {
 	private final ReservationRepository reservationRepository;
 	private final UserUtil userUtil;
 	private final CourtUtil courtUtil;
-	private final MailTemplateService mailTemplateService;
+	private final MailUtil mailUtil;
+	private final NotificationUtil notificationUtil;
 
 	public ReservationSingleResponse reserve(ReservationSingleRequest request, Long courtId) {
 		User booker = userUtil.getCurrentUser();
@@ -52,7 +54,7 @@ public class ReservationService {
 					court.getReservations().add(r);
 					courtUtil.save(court);
 				})
-				.peek(r -> mailTemplateService.sendReservationInfoEmail(
+				.peek(r -> mailUtil.sendReservationInfoEmail(
 						booker.getEmail(),
 						booker.getName(),
 						court.getClub().getName(),
@@ -61,6 +63,7 @@ public class ReservationService {
 						r.getTimeTo(),
 						"Potwierdzenie rezerwacji: zarezerwowano poprawnie!"
 				))
+				.peek(r -> notificationUtil.sendManagementNotification(booker.getId(), "Zarezerwowano"))
 				.map(reservationMapper::map)
 				.get();
 	}
@@ -82,7 +85,7 @@ public class ReservationService {
 				})
 				.peek(r -> validate(r, true))
 				.peek(reservationUtil::save)
-				.peek(r -> mailTemplateService.sendReservationInfoEmail(
+				.peek(r -> mailUtil.sendReservationInfoEmail(
 						booker.getEmail(),
 						booker.getName(),
 						r.getCourt().getClub().getName(),
@@ -104,7 +107,7 @@ public class ReservationService {
 		reservation.setCanceled(true);
 		reservationUtil.save(reservation);
 
-		mailTemplateService.sendReservationInfoEmail(
+		mailUtil.sendReservationInfoEmail(
 				booker.getEmail(),
 				booker.getName(),
 				reservation.getCourt().getClub().getName(),
@@ -122,7 +125,7 @@ public class ReservationService {
 		reservation.setConfirmed(true);
 		reservationUtil.save(reservation);
 
-		mailTemplateService.sendReservationInfoEmail(
+		mailUtil.sendReservationInfoEmail(
 				booker.getEmail(),
 				booker.getName(),
 				reservation.getCourt().getClub().getName(),
