@@ -27,7 +27,12 @@ public class Reservation {
 	private String message;
 
 	public boolean areReservationsConcurrent(Reservation other) {
-		return !(timeTo.isBefore(other.timeFrom) || timeFrom.isAfter(other.timeTo));
+		return
+				(timeFrom.isBefore(other.timeTo) && timeTo.isAfter(other.timeTo))
+						|| (timeFrom.isEqual(other.timeFrom))
+						|| (timeTo.isEqual(other.timeTo))
+						|| (other.timeFrom.isBefore(timeTo)) && other.timeTo.isAfter(timeTo)
+				;
 	}
 
 }
