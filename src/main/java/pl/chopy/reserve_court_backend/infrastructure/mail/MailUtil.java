@@ -16,7 +16,6 @@ public class MailUtil {
 	private final RabbitTemplate rabbitTemplate;
 
 	public void sendWelcomeEmail(String email, String name) {
-
 		rabbitTemplate.convertAndSend("mailingQueue", new MailSingleRequest(
 				email,
 				"Witaj w ReServeCourt, " + name + "!",
@@ -26,19 +25,15 @@ public class MailUtil {
 	}
 
 	public void sendPasswordResetEmail(String email, String token) {
-		var message = new Context();
-		message.setVariable("email", email);
-		message.setVariable("token", token);
 		rabbitTemplate.convertAndSend("mailingQueue", new MailSingleRequest(
 				email,
 				"Resetowanie hasła w ReServeCourt",
 				"password_reset",
-				new HashMap<>())
+				new HashMap<>(Map.of("email", email, "token", token)))
 		);
 	}
 
 	public void sendReservationInfoEmail(String email, String name, String clubName, String courtName, LocalDateTime from, LocalDateTime to, String message) {
-
 		rabbitTemplate.convertAndSend("mailingQueue", new MailSingleRequest(
 				email,
 				"Witaj w ReServeCourt, " + name + "!",
