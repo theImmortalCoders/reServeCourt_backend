@@ -13,16 +13,16 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserSingleRegisterRequest {
-    @Size(min = 3, max = 20)
-    private String name;
-    @Size(min = 3, max = 20)
-    private String surname;
-    @NotNull
-    private LocalDate birthDate;
-    @Size(min = 4, max = 20)
-    private String password;
-    private String phoneNumber;
-    @Size(min = 4, max = 30)
-    @Email
-    private String email;
+	@Size(min = 3, max = 20)
+	private String name;
+	@Size(min = 3, max = 20)
+	private String surname;
+	@NotNull
+	private LocalDate birthDate;
+	@Size(min = 4, max = 20)
+	private String password;
+	private String phoneNumber;
+	@Size(min = 4, max = 30)
+	@Email
+	private String email;
 }

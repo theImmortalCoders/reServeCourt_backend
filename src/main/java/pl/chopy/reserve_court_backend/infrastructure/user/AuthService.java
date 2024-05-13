@@ -14,8 +14,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.server.ResponseStatusException;
-import pl.chopy.reserve_court_backend.infrastructure.mail.MailTemplateService;
+import pl.chopy.reserve_court_backend.infrastructure.mail.MailUtil;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapper;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserChangePasswordRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleLoginRequest;
@@ -34,99 +35,103 @@ import java.util.UUID;
 @Service
 @AllArgsConstructor
 public class AuthService {
-    private final UserRepository userRepository;
-    private final PasswordResetTokenRepository passwordResetTokenRepository;
-    private final UserUtil userUtil;
-    private final BCryptPasswordEncoder passwordEncoder;
-    private final MailTemplateService mailTemplateService;
-    private final UserMapper userMapper;
-    private final SecurityContextHolderStrategy securityContextHolderStrategy;
-    private final SecurityContextRepository securityContextRepository;
+	private final UserRepository userRepository;
+	private final PasswordResetTokenRepository passwordResetTokenRepository;
+	private final UserUtil userUtil;
+	private final BCryptPasswordEncoder passwordEncoder;
+	private final MailUtil mailUtil;
+	private final UserMapper userMapper;
+	private final SecurityContextHolderStrategy securityContextHolderStrategy;
+	private final SecurityContextRepository securityContextRepository;
 
-    void authenticate(@NotNull UserSingleLoginRequest userRequest, HttpServletRequest request, HttpServletResponse response) {
-        User user = Option.ofOptional(getOptionalByEmail(userRequest.getEmail()))
-                .filter(u -> passwordEncoder.matches(userRequest.getPassword(), u.getHashedPassword()))
-                .getOrElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials for user '" + userRequest.getEmail() + "'.")
-                );
+	void authenticate(@NotNull UserSingleLoginRequest userRequest, HttpServletRequest request, HttpServletResponse response) {
+		User user = Option.ofOptional(getOptionalByEmail(userRequest.getEmail()))
+				.filter(u -> passwordEncoder.matches(userRequest.getPassword(), u.getHashedPassword()))
+				.peek(u -> {
+					u.setSessionId(RequestContextHolder.currentRequestAttributes().getSessionId());
+					userUtil.saveUser(u);
+				})
+				.getOrElseThrow(() ->
+						new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials for user '" + userRequest.getEmail() + "'.")
+				);
 
-        updateSecurityContext(request, response, user);
-    }
+		updateSecurityContext(request, response, user);
+	}
 
-    void register(@NotNull UserSingleRegisterRequest request) {
-        Option.ofOptional(getOptionalByEmail(request.getEmail()))
-                .map(user -> {
-                    throw new ResponseStatusException(HttpStatus.CONFLICT, "User '" + request.getEmail() + "' already exists");
-                });
+	void register(@NotNull UserSingleRegisterRequest request) {
+		Option.ofOptional(getOptionalByEmail(request.getEmail()))
+				.map(user -> {
+					throw new ResponseStatusException(HttpStatus.CONFLICT, "User '" + request.getEmail() + "' already exists");
+				});
 
-        if (Period.between(request.getBirthDate(), LocalDate.now()).getYears() < 15) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not have 15 years old");
-        }
+		if (Period.between(request.getBirthDate(), LocalDate.now()).getYears() < 15) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not have 15 years old");
+		}
 
-        User user = userMapper.map(request);
-        user.setHashedPassword(passwordEncoder.encode(request.getPassword()));
+		User user = userMapper.map(request);
+		user.setHashedPassword(passwordEncoder.encode(request.getPassword()));
 
-        userUtil.saveUser(user);
-        mailTemplateService.sendWelcomeEmail(user.getEmail(), user.getName());
-    }
+		userUtil.saveUser(user);
+		mailUtil.sendWelcomeEmail(user.getEmail(), user.getName());
+	}
 
-    void changePassword(@NotNull UserChangePasswordRequest request) {
-        User user = userUtil.getCurrentUser();
+	void changePassword(@NotNull UserChangePasswordRequest request) {
+		User user = userUtil.getCurrentUser();
 
-        if (!passwordEncoder.matches(request.getOldPassword(), user.getHashedPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid old password");
-        }
+		if (!passwordEncoder.matches(request.getOldPassword(), user.getHashedPassword())) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid old password");
+		}
 
-        user.setHashedPassword(passwordEncoder.encode(request.getNewPassword()));
-        userUtil.saveUser(user);
-    }
+		user.setHashedPassword(passwordEncoder.encode(request.getNewPassword()));
+		userUtil.saveUser(user);
+	}
 
-    void requestPasswordReset(String email) {
-        User user = userUtil.getUserByEmail(email);
+	void requestPasswordReset(String email) {
+		User user = userUtil.getUserByEmail(email);
 
-        PasswordResetToken token = new PasswordResetToken();
-        token.setToken(UUID.randomUUID().toString());
-        token.setEmail(user.getEmail());
-        token.setExpiring(LocalDateTime.now().plusMinutes(10));
-        passwordResetTokenRepository.save(token);
+		PasswordResetToken token = new PasswordResetToken();
+		token.setToken(UUID.randomUUID().toString());
+		token.setEmail(user.getEmail());
+		token.setExpiring(LocalDateTime.now().plusMinutes(10));
+		passwordResetTokenRepository.save(token);
 
-        mailTemplateService.sendPasswordResetEmail(user.getEmail(), token.getToken());
-    }
+		mailUtil.sendPasswordResetEmail(user.getEmail(), token.getToken());
+	}
 
-    public void resetPassword(String tokenValue, String newPassword) {
-        PasswordResetToken token = passwordResetTokenRepository.findByToken(tokenValue)
-                .filter(t -> t.getExpiring().isAfter(LocalDateTime.now()))
-                .orElseThrow(
-                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token invalid")
-                );
+	public void resetPassword(String tokenValue, String newPassword) {
+		PasswordResetToken token = passwordResetTokenRepository.findByToken(tokenValue)
+				.filter(t -> t.getExpiring().isAfter(LocalDateTime.now()))
+				.orElseThrow(
+						() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token invalid")
+				);
 
-        User user = userUtil.getUserByEmail(token.getEmail());
+		User user = userUtil.getUserByEmail(token.getEmail());
 
-        user.setHashedPassword(passwordEncoder.encode(newPassword));
-        userUtil.saveUser(user);
-    }
+		user.setHashedPassword(passwordEncoder.encode(newPassword));
+		userUtil.saveUser(user);
+	}
 
-    void updateSecurityContext(HttpServletRequest request, HttpServletResponse response, User user) {
-        SecurityContext context = securityContextHolderStrategy.createEmptyContext();
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(
-                user.getEmail(),
-                user.getHashedPassword(),
-                user.getAuthorities()
-        ));
+	void updateSecurityContext(HttpServletRequest request, HttpServletResponse response, User user) {
+		SecurityContext context = securityContextHolderStrategy.createEmptyContext();
+		context.setAuthentication(new UsernamePasswordAuthenticationToken(
+				user.getEmail(),
+				user.getHashedPassword(),
+				user.getAuthorities()
+		));
 
-        securityContextHolderStrategy.setContext(context);
-        securityContextRepository.saveContext(context, request, response);
-    }
+		securityContextHolderStrategy.setContext(context);
+		securityContextRepository.saveContext(context, request, response);
+	}
 
-    void logoutUser(HttpServletRequest request, HttpServletResponse response) {
-        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
-        logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
-        SecurityContextHolder.getContext().setAuthentication(null);
-    }
+	void logoutUser(HttpServletRequest request, HttpServletResponse response) {
+		SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+		logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
+		SecurityContextHolder.getContext().setAuthentication(null);
+	}
 
-    //
+	//
 
-    private Optional<User> getOptionalByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
+	private Optional<User> getOptionalByEmail(String email) {
+		return userRepository.findByEmail(email);
+	}
 }

@@ -9,13 +9,13 @@ import java.util.List;
 
 @Data
 public class CourtSingleResponse {
-    private Long id;
-    private String name;
-    private String description;
-    private Long clubId;
-    private Court.CourtType type;
-    private Court.Surface surface;
-    private Location location;
-    private boolean closed;
-    private List<ImageSingleResponse> images;
+	private Long id;
+	private String name;
+	private String description;
+	private Long clubId;
+	private Court.CourtType type;
+	private Court.Surface surface;
+	private Location location;
+	private boolean closed;
+	private List<ImageSingleResponse> images;
 }

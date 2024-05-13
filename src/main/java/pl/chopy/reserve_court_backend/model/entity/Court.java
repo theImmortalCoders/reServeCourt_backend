@@ -13,33 +13,33 @@ import java.util.List;
 @Entity
 @Data
 public class Court {
-    @Id
-    @GeneratedValue
-    private Long id;
-    private String name;
-    private String description;
-    @ManyToOne(cascade = CascadeType.DETACH)
-    @JoinColumn(name = "club_id")
-    @ToString.Exclude
-    private Club club;
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "court")
-    private List<Reservation> reservations = new ArrayList<>();
-    @Enumerated(EnumType.STRING)
-    private CourtType type;
-    @Enumerated(EnumType.STRING)
-    private Surface surface;
-    @Type(JsonBinaryType.class)
-    @Column(columnDefinition = "jsonb")
-    private Location location;
-    private boolean closed = false;
-    @ManyToMany
-    private List<Image> images = new ArrayList<>();
+	@Id
+	@GeneratedValue
+	private Long id;
+	private String name;
+	private String description;
+	@ManyToOne(cascade = CascadeType.DETACH)
+	@JoinColumn(name = "club_id")
+	@ToString.Exclude
+	private Club club;
+	@OneToMany(cascade = CascadeType.REMOVE, mappedBy = "court")
+	private List<Reservation> reservations = new ArrayList<>();
+	@Enumerated(EnumType.STRING)
+	private CourtType type;
+	@Enumerated(EnumType.STRING)
+	private Surface surface;
+	@Type(JsonBinaryType.class)
+	@Column(columnDefinition = "jsonb")
+	private Location location;
+	private boolean closed = false;
+	@ManyToMany
+	private List<Image> images = new ArrayList<>();
 
-    public enum CourtType {
-        INDOOR, OUTDOOR
-    }
+	public enum CourtType {
+		INDOOR, OUTDOOR
+	}
 
-    public enum Surface {
-        CLAY, CONCRETE, GRASS, ACRYLIC
-    }
+	public enum Surface {
+		CLAY, CONCRETE, GRASS, ACRYLIC
+	}
 }

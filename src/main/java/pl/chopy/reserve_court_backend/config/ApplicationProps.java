@@ -13,7 +13,9 @@ import java.util.Set;
 @Data
 @ConfigurationProperties(prefix = "reserve-court.security")
 public class ApplicationProps {
-    private List<String> allowedOrigins;
-    private String defaultRole;
-    private Map<String, Set<String>> privileges = new LinkedHashMap<>();
+	private List<String> allowedOrigins;
+	private String defaultRole;
+	private String backendDomain;
+	private String socketDomain;
+	private Map<String, Set<String>> privileges = new LinkedHashMap<>();
 }

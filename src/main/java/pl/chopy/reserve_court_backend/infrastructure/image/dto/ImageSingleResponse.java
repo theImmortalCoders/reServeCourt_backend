@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class ImageSingleResponse {
-    private Long id;
-    private String path;
-    private boolean hasThumbnail;
-    private Long authorId;
+	private Long id;
+	private String path;
+	private boolean hasThumbnail;
+	private Long authorId;
 }
