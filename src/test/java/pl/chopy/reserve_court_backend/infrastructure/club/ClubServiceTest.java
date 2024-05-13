@@ -21,6 +21,7 @@ import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
 import pl.chopy.reserve_court_backend.model.DaysOpen;
 import pl.chopy.reserve_court_backend.model.entity.*;
 import pl.chopy.reserve_court_backend.model.entity.repository.ClubRepository;
+import pl.chopy.reserve_court_backend.model.entity.repository.RateRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +39,11 @@ public class ClubServiceTest {
 	private Image image;
 	private User user;
 	private final ClubRepository clubRepository = mock(ClubRepository.class);
+	private final RateRepository rateRepository = mock(RateRepository.class);
 	@Spy
 	private ClubUtil clubUtil = new ClubUtil(clubRepository);
+	@Spy
+	private RateUtil rateUtil = new RateUtil(rateRepository);
 	@Mock
 	private ImageUtil imageUtil;
 	@Mock
@@ -125,5 +129,19 @@ public class ClubServiceTest {
 		response.setDaysOpen(new DaysOpen());
 
 		assertEquals(response, clubService.getDetails(1L));
+	}
+
+	@Test
+	public void shouldRateClub() {
+		var rate = new Rate();
+		rate.setId(1L);
+		rate.setClub(club);
+		rate.setUser(user);
+
+		when(rateRepository.save(any(Rate.class))).thenReturn(rate);
+
+		clubService.rate(1L, 4.0);
+
+		assertEquals(1, club.getRates().size());
 	}
 }

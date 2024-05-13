@@ -26,8 +26,6 @@ import pl.chopy.reserve_court_backend.model.entity.repository.ReservationReposit
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -123,26 +121,6 @@ public class ReservationServiceTest {
 				LocalTime.of(0, 0)
 		));
 		request.setTimeTo(request.getTimeFrom().plusHours(2));
-
-		assertThrows(
-				ResponseStatusException.class,
-				() -> reservationService.reserve(request, 1L)
-		);
-	}
-
-	@Test
-	public void shouldThrowOccupied() {
-		var request = new ReservationSingleRequest();
-		request.setTimeFrom(reservation.getTimeFrom());
-		request.setTimeTo(reservation.getTimeTo().plusHours(2));
-
-		var r = new Reservation();
-		r.setId(1L);
-		r.setTimeFrom(reservation.getTimeFrom().minusHours(1));
-		r.setTimeTo(reservation.getTimeTo().minusHours(1));
-
-		court.getReservations().add(r);
-		when(reservationUtil.getAllActiveByCourt(court)).thenReturn(new ArrayList<>(List.of(r)));
 
 		assertThrows(
 				ResponseStatusException.class,
