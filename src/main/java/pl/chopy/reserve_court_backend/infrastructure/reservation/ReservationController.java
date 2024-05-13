@@ -77,6 +77,18 @@ public class ReservationController {
 		return ResponseEntity.ok(reservationService.getByCourtWithFilters(courtId, from, to));
 	}
 
+	@GetMapping("/my")
+	@Operation(summary = "Get all by current user (Login)")
+	@ApiResponse(responseCode = "200")
+	@ApiResponse(responseCode = "401")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<List<ReservationShortResponse>> getByCurrentUser(
+			@RequestParam(required = false) LocalDateTime from,
+			@RequestParam(required = false) LocalDateTime to
+	) {
+		return ResponseEntity.ok(reservationService.getByCurrentUser(from, to));
+	}
+
 	@GetMapping("/{clubId}/upcoming")
 	@Operation(summary = "Get upcoming by club (Admin)")
 	@ApiResponse(responseCode = "200")

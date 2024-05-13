@@ -44,6 +44,17 @@ public class ClubController {
 		clubService.update(clubId, request);
 	}
 
+	@PostMapping("/{clubId}/rate")
+	@Operation(summary = "Rate club (Login)")
+	@ApiResponse(responseCode = "200")
+	@ApiResponse(responseCode = "401")
+	@ApiResponse(responseCode = "400", description = "Rating must be between 0 and 5.0")
+	@ApiResponse(responseCode = "404")
+	@PreAuthorize("isAuthenticated()")
+	public void rate(@PathVariable Long clubId, @RequestParam double rate) {
+		clubService.rate(clubId, rate);
+	}
+
 	@DeleteMapping("/{clubId}")
 	@Operation(summary = "Delete club (Admin)", description = "Only when no active reservations")
 	@ApiResponse(responseCode = "200")
@@ -65,12 +76,10 @@ public class ClubController {
 			@RequestParam(defaultValue = "id") String sort,
 			@RequestParam(defaultValue = "DESC") Sort.Direction sortDirection,
 			@RequestParam(required = false) String ownerName,
-			@RequestParam(required = false) String name,
-			@RequestParam(required = false) Double minRating,
-			@RequestParam(required = false) Double maxRating
+			@RequestParam(required = false) String name
 	) {
 		var pageRequest = PageRequest.of(page, size, sortDirection, sort);
-		return ResponseEntity.ok(clubService.getAll(pageRequest, ownerName, name, minRating, maxRating));
+		return ResponseEntity.ok(clubService.getAll(pageRequest, ownerName, name));
 	}
 
 	@GetMapping("/{clubId}")

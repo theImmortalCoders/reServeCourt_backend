@@ -19,10 +19,12 @@ import pl.chopy.reserve_court_backend.infrastructure.reservation.ReservationUtil
 import pl.chopy.reserve_court_backend.infrastructure.user.UserUtil;
 import pl.chopy.reserve_court_backend.model.DaysOpen;
 import pl.chopy.reserve_court_backend.model.entity.Club;
+import pl.chopy.reserve_court_backend.model.entity.Rate;
 import pl.chopy.reserve_court_backend.model.entity.User;
 import pl.chopy.reserve_court_backend.model.entity.repository.ClubRepository;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -32,6 +34,7 @@ public class ClubService {
 	private final ImageUtil imageUtil;
 	private final ClubRepository clubRepository;
 	private final UserUtil userUtil;
+	private final RateUtil rateUtil;
 	private final ReservationUtil reservationUtil;
 	private final NotificationUtil notificationUtil;
 
@@ -84,13 +87,11 @@ public class ClubService {
 		clubRepository.delete(club);
 	}
 
-	public Page<ClubShortResponse> getAll(PageRequest pageRequest, String ownerName, String name, Double minRating, Double maxRating) {
+	public Page<ClubShortResponse> getAll(PageRequest pageRequest, String ownerName, String name) {
 		return new PageImpl<>(
 				clubRepository.findAllWithFilters(
 								ownerName,
 								name,
-								minRating,
-								maxRating,
 								pageRequest
 						).stream()
 						.map(clubMapper::shortMap)
@@ -113,6 +114,30 @@ public class ClubService {
 
 				})
 				.get();
+	}
+
+	public void rate(Long clubId, double rating) {
+		if (rating < 0 || rating > 5) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Rating must be between 0 and 5");
+		}
+
+		Club club = clubUtil.getById(clubId);
+		User user = userUtil.getCurrentUser();
+
+		List<Rate> existingRatings = rateUtil.findAllByUserAndClub(user.getId(), clubId);
+		for (var r : existingRatings) {
+			rateUtil.delete(r);
+		}
+
+		Rate rate = new Rate();
+		rate.setClub(club);
+		rate.setUser(user);
+		rate.setValue(rating);
+
+		rateUtil.save(rate);
+
+		club.getRates().add(rate);
+		clubUtil.save(club);
 	}
 
 	//

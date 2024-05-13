@@ -82,13 +82,13 @@ public class UserController {
 	}
 
 	@PatchMapping("/{userId}/role")
-	@Operation(summary = "Change user's role (Admin)", description = "Change user's role")
+	@Operation(summary = "Change user's role (Superadmin)", description = "Change user's role")
 	@ApiResponse(responseCode = "200", description = "Successfully changed role")
 	@ApiResponse(responseCode = "400", description = "Invalid request")
 	@ApiResponse(responseCode = "401", description = "Unauthorized")
 	@ApiResponse(responseCode = "403", description = "Forbidden")
 	@ApiResponse(responseCode = "404", description = "User not found")
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('SUPERADMIN')")
 	public void updateRole(@PathVariable Long userId, @RequestParam User.UserRole newRole) {
 		userService.updateUserRole(userId, newRole);
 	}

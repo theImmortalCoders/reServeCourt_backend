@@ -3,7 +3,6 @@ package pl.chopy.reserve_court_backend.infrastructure.mail;
 import lombok.AllArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.context.Context;
 import pl.chopy.reserve_court_backend.infrastructure.mail.dto.MailSingleRequest;
 
 import java.time.LocalDateTime;
