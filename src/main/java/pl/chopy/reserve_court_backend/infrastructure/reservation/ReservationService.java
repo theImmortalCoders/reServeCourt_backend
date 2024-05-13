@@ -159,6 +159,15 @@ public class ReservationService {
 				.toList();
 	}
 
+	public List<ReservationShortResponse> getByCurrentUser(LocalDateTime from, LocalDateTime to) {
+		User user = userUtil.getCurrentUser();
+
+		return reservationRepository.findAllByBookerWithFilter(user.getId(), from, to)
+				.stream()
+				.map(reservationMapper::shortMap)
+				.toList();
+	}
+
 	//
 
 	private static void checkIfAdminOrBooker(User booker, Reservation reservation) {

@@ -12,7 +12,12 @@ import java.util.List;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 	List<Reservation> findAllByCourt(Court court);
 
-	List<Reservation> findAllByBooker(User booker);
+	@Query("SELECT r from Reservation r " +
+			"WHERE (r.booker.id = ?1) " +
+			"AND (cast(?2 as localdatetime) IS NULL OR r.timeFrom >= ?2) " +
+			"AND (cast(?3 as localdatetime) IS NULL OR r.timeFrom <= ?3) " +
+			"AND r.isCanceled = false ")
+	List<Reservation> findAllByBookerWithFilter(Long bookerId, LocalDateTime from, LocalDateTime to);
 
 	@Query("SELECT r from Reservation r " +
 			"WHERE (r.court.club.id = ?1) " +
