@@ -31,7 +31,7 @@ public class User implements UserDetails {
 	private String sessionId;
 
 	public enum UserRole {
-		USER, ADMIN
+		USER, ADMIN, SUPERADMIN
 	}
 
 	@Override
