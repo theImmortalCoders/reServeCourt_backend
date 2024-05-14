@@ -137,7 +137,7 @@ public class ReservationService {
 	}
 
 	public List<ReservationShortResponse> getByCourtWithFilters(Long courtId, LocalDateTime from, LocalDateTime to) {
-		return reservationRepository.findAllByCourtWithFilters(courtId, from, to)
+		return reservationRepository.findAllByCourtWithNotMandatoryDateFilters(courtId, from, to)
 				.stream()
 				.map(reservationMapper::shortMap)
 				.toList();
