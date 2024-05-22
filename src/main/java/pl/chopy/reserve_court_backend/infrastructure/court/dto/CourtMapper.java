@@ -11,7 +11,6 @@ import pl.chopy.reserve_court_backend.model.entity.Court;
 public interface CourtMapper {
 	Court map(CourtSingleRequest request);
 
-	@Mapping(target = "image", ignore = true)
 	@Mapping(target = "clubId", source = "club.id")
 	CourtShortResponse shortMap(Court court);
 
