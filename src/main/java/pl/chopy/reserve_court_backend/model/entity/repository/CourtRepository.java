@@ -10,6 +10,6 @@ public interface CourtRepository extends JpaRepository<Court, Long> {
 	@Query("SELECT c from Court c " +
 			"WHERE(?1 IS NULL OR c.surface = ?1) " +
 			"AND (?2 IS NULL OR c.type = ?2) " +
-			"AND (?3 IS NULL OR cast(c.location as string) like %?3%)")
+			"AND (?3 IS NULL OR lower(cast(c.location as string)) LIKE CONCAT('%', lower(cast(?3 as string)), '%'))")
 	List<Court> findAllWithFilters(Court.Surface surface, Court.CourtType type, String location);
 }
