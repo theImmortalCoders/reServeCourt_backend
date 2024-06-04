@@ -1,32 +1,26 @@
-# Tennis Court Reservation System
+# ReServe COurt - Tennis Court Reservation System (Web API)
 
 ## Description
 
-This project aims to develop an application for managing tennis courts and reservations. The application will consist of
-two main panels: Client and Administration. In the Administration panel, the Admin will have the capability to manage
-tennis courts and reservations, including tasks such as adding, editing, and deleting. In the Client panel, users will
-be able to create and manage their reservations efficiently.
+This project aims to develop an application for managing tennis courts and reservations. The application consists of
+two main panels: Client and Administration. In the Administration panel, the Admin have the capability to manage
+tennis courts and reservations, including tasks such as adding, editing, and deleting. In the Client panel, users are
+able to create and manage their reservations efficiently.
 
-## Team Members
+## Key Features
 
-- **Marcin Bator** (@marcinbator)
-- **Igor Litwa** (@miszor03)
-- **Wiktor Mazur** (@ZegarekPL)
-- **Paweł Buczek** (@pablitoo1)
-- **Bartłomiej Krówka** (@bkrowka)
-
-## Features
-
-- **Administration Panel:**
-    - Manage tennis courts
-    - Manage reservations (add, edit, delete)
-    - Admin privileges
-- **Client Panel:**
-    - Create reservations
-    - Manage personal reservations
-    - User-friendly interface
+- Asynchronous notifications management with Rabbit and websocket
+- Mailing system with Thymeleaf
+- REST API
 
 ## Technologies Used
 
-- Frontend: React/Next.js (TypeScript), TailwindCSS
-- Backend: Java, Spring Boot, PostgreSQL, Docker
+Java 17, Spring Boot 3, PostgreSQL, Docker, RabbitMQ
+
+## Team Members
+
+- **Marcin Bator** (@marcinbator) BE
+- **Igor Litwa** (@miszor03) PM
+- **Wiktor Mazur** (@ZegarekPL) FE
+- **Paweł Buczek** (@pablitoo1) FE
+- **Bartłomiej Krówka** (@bkrowka) FE
