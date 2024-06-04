@@ -1,4 +1,4 @@
-# ReServe COurt - Tennis Court Reservation System (Web API)
+# ReServe Court - Tennis court reservation system (Web API)
 
 ## Description
 
