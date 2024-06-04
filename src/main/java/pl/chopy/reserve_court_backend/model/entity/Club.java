@@ -28,7 +28,8 @@ public class Club {
 	@ManyToOne(cascade = CascadeType.DETACH)
 	@JoinColumn(name = "owner_id")
 	private User owner;
-	private double rating = 0.0;
+	@OneToMany(cascade = CascadeType.REMOVE, mappedBy = "club")
+	private List<Rate> rates = new ArrayList<>();
 	@Type(JsonBinaryType.class)
 	@Column(columnDefinition = "jsonb")
 	private DaysOpen daysOpen = new DaysOpen();

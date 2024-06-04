@@ -17,6 +17,6 @@ public class HoursOpen {
 	}
 
 	boolean checkIsIntervalBetween(LocalTime from, LocalTime to) {
-		return from.isAfter(open) && to.isBefore(closed);
+		return !from.isBefore(open) && !to.isAfter(closed);
 	}
 }

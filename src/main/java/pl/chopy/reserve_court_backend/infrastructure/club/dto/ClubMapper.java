@@ -11,6 +11,7 @@ import pl.chopy.reserve_court_backend.infrastructure.image.dto.ImageMapperImpl;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapper;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapperImpl;
 import pl.chopy.reserve_court_backend.model.entity.Club;
+import pl.chopy.reserve_court_backend.model.entity.Rate;
 
 @Mapper
 public interface ClubMapper {
@@ -25,7 +26,9 @@ public interface ClubMapper {
 		response.setName(request.getName());
 		response.setDescription(request.getDescription());
 		response.setLogo(imageMapper.map(request.getLogo()));
-		response.setRating(request.getRating());
+
+		double avg = request.getRates().stream().mapToDouble(Rate::getValue).average().orElse(0);
+		response.setRating(avg);
 		response.setCourtsAmount(request.getCourts().size());
 		response.setLocation(request.getLocation());
 
@@ -42,7 +45,8 @@ public interface ClubMapper {
 		response.setName(request.getName());
 		response.setDescription(request.getDescription());
 		response.setLocation(request.getLocation());
-		response.setRating(request.getRating());
+		double avg = request.getRates().stream().mapToDouble(Rate::getValue).average().orElse(0);
+		response.setRating(avg);
 		response.setLogo(imageMapper.map(request.getLogo()));
 		response.setCourts(request.getCourts()
 				.stream()

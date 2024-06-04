@@ -1,6 +1,7 @@
 package pl.chopy.reserve_court_backend.infrastructure.reservation.dto.response;
 
 import lombok.Data;
+import pl.chopy.reserve_court_backend.infrastructure.court.dto.response.CourtShortResponse;
 
 import java.time.LocalDateTime;
 
@@ -12,4 +13,5 @@ public class ReservationShortResponse {
 	private boolean reservedByOwner;
 	private LocalDateTime timeFrom;
 	private LocalDateTime timeTo;
+	private CourtShortResponse court;
 }

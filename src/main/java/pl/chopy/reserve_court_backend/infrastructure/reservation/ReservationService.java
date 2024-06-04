@@ -137,7 +137,7 @@ public class ReservationService {
 	}
 
 	public List<ReservationShortResponse> getByCourtWithFilters(Long courtId, LocalDateTime from, LocalDateTime to) {
-		return reservationRepository.findAllByCourtWithFilters(courtId, from, to)
+		return reservationRepository.findAllByCourtWithNotMandatoryDateFilters(courtId, from, to)
 				.stream()
 				.map(reservationMapper::shortMap)
 				.toList();
@@ -154,6 +154,15 @@ public class ReservationService {
 
 	public List<ReservationShortResponse> getUpcomingByClubAndConfirmed(Long clubId, Boolean confirmed) {
 		return reservationRepository.findAllByClubAndDateFromWithFilter(clubId, LocalDateTime.now(), confirmed)
+				.stream()
+				.map(reservationMapper::shortMap)
+				.toList();
+	}
+
+	public List<ReservationShortResponse> getByCurrentUser(LocalDateTime from, LocalDateTime to) {
+		User user = userUtil.getCurrentUser();
+
+		return reservationRepository.findAllByBookerWithFilter(user.getId(), from, to)
 				.stream()
 				.map(reservationMapper::shortMap)
 				.toList();
