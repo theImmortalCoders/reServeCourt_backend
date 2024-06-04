@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5437/data
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+reserve-court:
+  security:
+    backend-domain: http://localhost:8080
+    socket-domain: http://localhost:3000
+    allowedOrigins:
+      - http://localhost:3000
+      - http://localhost:8080
+      - http://192.168.100.204:3000
