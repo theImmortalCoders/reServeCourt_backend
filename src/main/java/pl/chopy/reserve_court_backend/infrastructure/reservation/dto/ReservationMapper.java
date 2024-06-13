@@ -6,14 +6,13 @@ import pl.chopy.reserve_court_backend.infrastructure.image.dto.ImageMapperImpl;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.dto.response.ReservationShortResponse;
 import pl.chopy.reserve_court_backend.infrastructure.reservation.dto.response.ReservationSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapperImpl;
-import pl.chopy.reserve_court_backend.infrastructure.user.dto.response.UserShortResponse;
 import pl.chopy.reserve_court_backend.model.entity.Reservation;
 
 @Mapper
 public interface ReservationMapper {
 	Reservation map(ReservationSingleRequest request);
 
-	default ReservationShortResponse shortMap(Reservation request){
+	default ReservationShortResponse shortMap(Reservation request) {
 		var response = new ReservationShortResponse();
 		response.setId(request.getId());
 		response.setConfirmed(request.isConfirmed());
@@ -28,7 +27,7 @@ public interface ReservationMapper {
 	}
 
 
-	default ReservationSingleResponse map(Reservation request){
+	default ReservationSingleResponse map(Reservation request) {
 		var response = new ReservationSingleResponse();
 		response.setId(request.getId());
 		response.setConfirmed(request.isConfirmed());
