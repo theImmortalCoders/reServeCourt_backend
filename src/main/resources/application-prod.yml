@@ -10,6 +10,8 @@ spring:
   rabbitmq:
     host: ${RABBIT_SERVICE_DOMAIN}
     port: 5672
+    username: ${RABBIT_USER}
+    password: ${RABBIT_PASSWORD}
 reserve-court:
   security:
     backend-domain: ${BACKEND_DOMAIN}
