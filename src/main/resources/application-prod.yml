@@ -1,17 +1,14 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5437/data
-    username: user
-    password: password
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
 reserve-court:
   security:
-    backend-domain: http://kni.prz.edu.pl:47453
-    socket-domain: http://kni.prz.edu.pl:47454
-    allowedOrigins:
-      - http://localhost:3000
-      - http://localhost:8080
-      - http://192.168.100.204:3000
+    backend-domain: ${BACKEND_DOMAIN}
+    socket-domain: ${FRONTEND_DOMAIN}
+    allowedOrigins: ${ALLOWED_ORIGINS}
