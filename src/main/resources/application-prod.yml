@@ -7,6 +7,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  rabbitmq:
+    host: ${RABBIT_SERVICE_DOMAIN}
+    port: 5672
 reserve-court:
   security:
     backend-domain: ${BACKEND_DOMAIN}
