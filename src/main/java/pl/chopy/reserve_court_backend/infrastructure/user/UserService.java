@@ -8,8 +8,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.UserMapper;
+import pl.chopy.reserve_court_backend.infrastructure.user.dto.response.StatsSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.response.UserSingleResponse;
+import pl.chopy.reserve_court_backend.model.entity.Court;
 import pl.chopy.reserve_court_backend.model.entity.User;
+import pl.chopy.reserve_court_backend.model.entity.repository.ClubRepository;
+import pl.chopy.reserve_court_backend.model.entity.repository.CourtRepository;
+import pl.chopy.reserve_court_backend.model.entity.repository.ReservationRepository;
 import pl.chopy.reserve_court_backend.model.entity.repository.UserRepository;
 
 @Service
@@ -19,6 +24,9 @@ public class UserService {
 	private final UserMapper userMapper;
 	private final UserUtil userUtil;
 	private final AuthService authService;
+	private final ClubRepository clubRepository;
+	private final ReservationRepository reservationRepository;
+	private final CourtRepository courtRepository;
 
 	UserSingleResponse getCurrentUserResponse() {
 		return userMapper.map(userUtil.getCurrentUser());
@@ -56,5 +64,14 @@ public class UserService {
 
 		user.setActive(false);
 		userUtil.saveUser(user);
+	}
+
+	public StatsSingleResponse getStats() {
+		var stats = new StatsSingleResponse();
+		stats.setClubsAmount((int) clubRepository.count());
+		stats.setReservationsAmount((int) reservationRepository.count());
+		stats.setIndoorCourtsAmount(courtRepository.countAllByType(Court.CourtType.INDOOR));
+		stats.setOutdoorCourtsAmount(courtRepository.countAllByType(Court.CourtType.OUTDOOR));
+		return stats;
 	}
 }

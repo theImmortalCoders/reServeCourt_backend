@@ -12,4 +12,6 @@ public interface CourtRepository extends JpaRepository<Court, Long> {
 			"AND (?2 IS NULL OR c.type = ?2) " +
 			"AND (?3 IS NULL OR lower(cast(c.location as string)) LIKE CONCAT('%', lower(cast(?3 as string)), '%'))")
 	List<Court> findAllWithFilters(Court.Surface surface, Court.CourtType type, String location);
+
+	int countAllByType(Court.CourtType type);
 }

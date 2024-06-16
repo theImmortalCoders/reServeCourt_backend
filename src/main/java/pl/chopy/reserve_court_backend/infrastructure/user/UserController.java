@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserChangePasswordRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleLoginRequest;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.request.UserSingleRegisterRequest;
+import pl.chopy.reserve_court_backend.infrastructure.user.dto.response.StatsSingleResponse;
 import pl.chopy.reserve_court_backend.infrastructure.user.dto.response.UserSingleResponse;
 import pl.chopy.reserve_court_backend.model.entity.User;
 import pl.chopy.reserve_court_backend.util.StringAsJSON;
@@ -131,5 +132,12 @@ public class UserController {
 	@PreAuthorize("isAuthenticated()")
 	public void logout(HttpServletRequest request, HttpServletResponse response) {
 		authService.logoutUser(request, response);
+	}
+
+	@GetMapping("/stats")
+	@Operation(summary = "Get stats")
+	@ApiResponse(responseCode = "200", description = "Successfully logged out")
+	public ResponseEntity<StatsSingleResponse> getStats() {
+		return ResponseEntity.ok(userService.getStats());
 	}
 }
