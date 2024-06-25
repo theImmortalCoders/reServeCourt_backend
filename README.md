@@ -10,7 +10,7 @@ able to create and manage their reservations efficiently.
 ## Key Features
 
 - Asynchronous notifications management with Rabbit and websocket
-- Mailing system with Thymeleaf
+- Mailing system with Thymeleaf and Rabbit queueing
 - REST API
 
 ## Technologies Used
