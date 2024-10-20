@@ -48,4 +48,4 @@ jobs:
           REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
           TARGET: "/"
           SCRIPT_BEFORE: ls
-          SCRIPT_AFTER: "touch /home/elo2212.txt"
+          SCRIPT_AFTER: "touch /home/elo22212.txt"
