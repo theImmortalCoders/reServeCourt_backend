@@ -23,25 +23,10 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
-    - name: Write SSH keys
-      run: |
-            which ssh-agent || (sudo apk update && sudo apk add openssh-client)
-            which rsync || (sudo apk update && sudo apk add rsync)
-            mkdir -p ~/.ssh
-            chmod 700 ~/.ssh
-            touch ~/.ssh/private.key
-            touch ~/.ssh/known_hosts
-            chmod 600 ~/.ssh/private.key
-            echo -e "${{ vars.MALWINA_SSH_SECRET }}" | tr -d '\r' > ~/.ssh/private.key
-            
-            eval $(ssh-agent -s)
-            ssh-add ~/.ssh/private.key
-    
-    - name: Update repo
-      run: |
-        ssh -p 47455 root@kni.prz.edu.pl << EOF
-        cd ../home/reserve/reServeCourt_backend
-        git pull
-        cd ..
-        docker compose up -d
-        EOF
+    - name: Deploy
+      uses: easingthemes/ssh-deploy@main
+      with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
