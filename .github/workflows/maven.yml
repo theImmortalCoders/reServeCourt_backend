@@ -25,17 +25,23 @@ jobs:
 
     - name: Write SSH keys
       run: |
-        install -m 600 -D /dev/null ~/.ssh/id_rsa
-        echo "${{ secrets.MALWINA_SSH_SECRET }}" | tr -d '\r' > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        host='kni.prz.edu.pl'
-        port=47455
-        hosts="$(dig +short "$host" | grep -v '\.$' | sed -z 's|\n|,|g')$host"
-        ssh-keyscan -H "$hosts" > ~/.ssh/known_hosts
+        which ssh-agent || (sudo apk update && sudo apk add openssh-client)
+        which rsync || (sudo apk update && sudo apk add rsync)
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+        touch ~/.ssh/private.key
+        touch ~/.ssh/known_hosts
+        chmod 600 ~/.ssh/private.key
+        echo -e "${{ vars.MALWINA_SSH_SECRET }}" | tr -d '\r' > ~/.ssh/private.key
+
+        ssh-keyscan -p 47455 kni.prz.edu.pl >> ~/.ssh/known_hosts
+        chmod 644 ~/.ssh/known_hosts
+        eval $(ssh-agent -s)
+        ssh-add ~/.ssh/private.key
     
     - name: Update repo
       run: |
-        ssh -p -v 47455 root@kni.prz.edu.pl << EOF
+        ssh -p 47455 root@kni.prz.edu.pl << EOF
         cd ../home/reserve/reServeCourt_backend
         git pull
         cd ..
