@@ -25,19 +25,17 @@ jobs:
 
     - name: Write SSH keys
       run: |
-        which ssh-agent || (sudo apk update && sudo apk add openssh-client)
-        which rsync || (sudo apk update && sudo apk add rsync)
-        mkdir -p ~/.ssh
-        chmod 700 ~/.ssh
-        touch ~/.ssh/private.key
-        touch ~/.ssh/known_hosts
-        chmod 600 ~/.ssh/private.key
-        echo -e "${{ vars.MALWINA_SSH_SECRET }}" | tr -d '\r' > ~/.ssh/private.key
-
-        ssh-keyscan -p 47455 kni.prz.edu.pl >> ~/.ssh/known_hosts
-        chmod 644 ~/.ssh/known_hosts
-        eval $(ssh-agent -s)
-        ssh-add ~/.ssh/private.key
+            which ssh-agent || (sudo apk update && sudo apk add openssh-client)
+            which rsync || (sudo apk update && sudo apk add rsync)
+            mkdir -p ~/.ssh
+            chmod 700 ~/.ssh
+            touch ~/.ssh/private.key
+            touch ~/.ssh/known_hosts
+            chmod 600 ~/.ssh/private.key
+            echo -e "${{ vars.MALWINA_SSH_SECRET }}" | tr -d '\r' > ~/.ssh/private.key
+            
+            eval $(ssh-agent -s)
+            ssh-add ~/.ssh/private.key
     
     - name: Update repo
       run: |
