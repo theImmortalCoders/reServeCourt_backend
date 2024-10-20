@@ -38,7 +38,7 @@ jobs:
     #     password: ${{ secrets.SSH_PASSWORD }}
     #     script: |
     #       touch elo222.txt
-
+    
     - name: Deploy
       uses: easingthemes/ssh-deploy@main
       with:
