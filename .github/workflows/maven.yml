@@ -30,4 +30,5 @@ jobs:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+          TARGET: "/"
           SCRIPT_AFTER: "touch /home/elo22.txt"
