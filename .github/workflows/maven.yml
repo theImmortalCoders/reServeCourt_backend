@@ -31,15 +31,9 @@ jobs:
         port: ${{ secrets.REMOTE_PORT }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          touch elo2222.txt
-    
-    # - name: Deploy
-    #   uses: easingthemes/ssh-deploy@main
-    #   with:
-    #       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-    #       REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-    #       REMOTE_USER: ${{ secrets.REMOTE_USER }}
-    #       REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
-    #       TARGET: "/"
-    #       SCRIPT_BEFORE: ls
-    #       SCRIPT_AFTER: "touch /home/elo22212.txt"
+          cd ../home/reserve/reServeCourt_backend/
+          git pull
+          docker build -t reserve_backend .
+          cd ..
+          docker compose up -d
+          echo "$(date): built successfully"
