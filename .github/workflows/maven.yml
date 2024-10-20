@@ -31,7 +31,7 @@ jobs:
         port: ${{ secrets.REMOTE_PORT }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          touch elo222.txt
+          touch elo2222.txt
     
     # - name: Deploy
     #   uses: easingthemes/ssh-deploy@main
