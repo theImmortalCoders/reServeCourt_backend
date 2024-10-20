@@ -34,7 +34,8 @@ jobs:
       run: |
         install -m 600 -D /dev/null ~/.ssh/id_rsa
         echo "${{ secrets.MALWINA_SSH_SECRET }}" > ~/.ssh/id_rsa
-        host='kni.prz.edu.pl:47455'
+        host='kni.prz.edu.pl'
+        port=47455
         hosts="$(dig +short "$host" | grep -v '\.$' | sed -z 's|\n|,|g')$host"
         ssh-keyscan -H "$hosts" > ~/.ssh/known_hosts
     - name: Update repo
