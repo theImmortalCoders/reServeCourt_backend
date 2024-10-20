@@ -35,5 +35,5 @@ jobs:
           git pull
           docker build -t reserve_backend .
           cd ..
-          docker compose up -d
-          echo "$(date): built successfully"
+          docker-compose up -d
+          echo "$(date): built successfully" >> deploy-log.txt
