@@ -23,11 +23,15 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
-    - name: Deploy
-      run: |
-            apt install sshpass
-            sshpass -p ${{ secrets.SSH_PASSWORD }} ssh -p 47455 root@kni.prz.edu.pl
-            touch elo222.txt
+    - name: SSH into Server
+      uses: appleboy/ssh-action@master
+      with:
+        host: kni.prz.edu.pl
+        username: root
+        port: 47455
+        password: ${{ secrets.SSH_PASSWORD }}
+        script: |
+          touch elo222.txt
 
     # - name: Deploy
     #   uses: easingthemes/ssh-deploy@main
